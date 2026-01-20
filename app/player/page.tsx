@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -37,7 +37,7 @@ const podcastData: Record<string, {
     },
 };
 
-export default function PlayerPage() {
+function PlayerContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const podcastId = searchParams.get("id") || "1";
@@ -222,5 +222,21 @@ export default function PlayerPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+function PlayerLoading() {
+    return (
+        <div className="min-h-screen w-full bg-[#f6f7f8] dark:bg-[#101922] flex justify-center items-center">
+            <div className="animate-pulse text-[#0d141b] dark:text-white">Loading...</div>
+        </div>
+    );
+}
+
+export default function PlayerPage() {
+    return (
+        <Suspense fallback={<PlayerLoading />}>
+            <PlayerContent />
+        </Suspense>
     );
 }
