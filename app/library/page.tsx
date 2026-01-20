@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import BottomNavigation from "@/components/BottomNavigation";
 
 interface PodcastItem {
@@ -118,17 +119,18 @@ export default function LibraryPage() {
                     </h3>
 
                     {filteredPodcasts.map((podcast) => (
-                        <div
+                        <Link
                             key={podcast.id}
-                            className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 rounded-2xl border border-white/50 dark:border-slate-700/50 flex items-center gap-4 shadow-sm group active:scale-[0.98] transition-all ${podcast.opacity ? "opacity-80" : ""
+                            href={`/player?id=${podcast.id}`}
+                            className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 rounded-2xl border border-white/50 dark:border-slate-700/50 flex items-center gap-4 shadow-sm group active:scale-[0.98] transition-all cursor-pointer ${podcast.opacity ? "opacity-80" : ""
                                 }`}
                         >
                             {/* Thumbnail */}
                             <div className="relative w-16 h-16 shrink-0 rounded-xl overflow-hidden shadow-md">
                                 <div
                                     className={`w-full h-full bg-center bg-cover ${podcast.imageFilter?.includes("hue-rotate")
-                                            ? "bg-[#137fec]/20"
-                                            : ""
+                                        ? "bg-[#137fec]/20"
+                                        : ""
                                         }`}
                                     style={{
                                         backgroundImage: `url("${podcast.image}")`,
@@ -160,12 +162,12 @@ export default function LibraryPage() {
                             </div>
 
                             {/* Play Button */}
-                            <button className="w-10 h-10 flex items-center justify-center bg-[#137fec] text-white rounded-full shadow-lg shadow-[#137fec]/20">
+                            <div className="w-10 h-10 flex items-center justify-center bg-[#137fec] text-white rounded-full shadow-lg shadow-[#137fec]/20">
                                 <span className="material-symbols-outlined filled text-xl">
                                     play_arrow
                                 </span>
-                            </button>
-                        </div>
+                            </div>
+                        </Link>
                     ))}
 
                     {filteredPodcasts.length === 0 && (
