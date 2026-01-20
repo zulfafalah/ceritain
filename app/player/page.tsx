@@ -87,137 +87,139 @@ export default function PlayerPage() {
     const remainingTime = `${Math.floor(remainingSeconds / 60).toString().padStart(2, "0")}:${(remainingSeconds % 60).toString().padStart(2, "0")}`;
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col max-w-[430px] mx-auto overflow-hidden shadow-2xl bg-[#f6f7f8] dark:bg-[#101922]">
-            {/* Top Navigation */}
-            <div className="flex items-center p-6 pb-2 justify-between">
-                <Link
-                    href="/library"
-                    className="flex size-12 shrink-0 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm cursor-pointer hover:scale-105 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[#0d141b] dark:text-white">expand_more</span>
-                </Link>
-                <h2 className="text-sm font-bold uppercase tracking-widest text-[#0d141b]/60 dark:text-white/60">Now Playing</h2>
-                <button className="flex size-12 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm cursor-pointer hover:scale-105 transition-transform">
-                    <span className="material-symbols-outlined text-[#0d141b] dark:text-white">share</span>
-                </button>
-            </div>
+        <div className="min-h-screen w-full bg-[#f6f7f8] dark:bg-[#101922] flex justify-center">
+            <div className="relative flex min-h-screen w-full max-w-[480px] flex-col overflow-hidden shadow-2xl bg-[#f6f7f8] dark:bg-[#101922]">
+                {/* Top Navigation */}
+                <div className="flex items-center p-6 pb-2 justify-between">
+                    <Link
+                        href="/library"
+                        className="flex size-12 shrink-0 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm cursor-pointer hover:scale-105 transition-transform"
+                    >
+                        <span className="material-symbols-outlined text-[#0d141b] dark:text-white">expand_more</span>
+                    </Link>
+                    <h2 className="text-sm font-bold uppercase tracking-widest text-[#0d141b]/60 dark:text-white/60">Now Playing</h2>
+                    <button className="flex size-12 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm cursor-pointer hover:scale-105 transition-transform">
+                        <span className="material-symbols-outlined text-[#0d141b] dark:text-white">share</span>
+                    </button>
+                </div>
 
-            {/* Album Art Section */}
-            <div className="flex-1 flex flex-col items-center justify-center p-8">
-                <div className="w-full aspect-square max-w-[320px] relative group">
-                    <div className="absolute inset-0 bg-[#137fec]/20 rounded-xl blur-2xl group-hover:blur-3xl transition-all opacity-50"></div>
-                    <div className="relative w-full h-full overflow-hidden rounded-xl shadow-2xl bg-gradient-to-br from-[#137fec] via-purple-500 to-pink-500 flex items-center justify-center">
-                        <div
-                            className="w-full h-full bg-center bg-no-repeat bg-cover opacity-90 mix-blend-overlay"
-                            style={{
-                                backgroundImage: `url("${podcast.image}")`,
-                            }}
-                        />
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6">
-                            <span className="material-symbols-outlined text-6xl mb-4 opacity-80">graphic_eq</span>
-                            <div className="text-center">
-                                <div className="text-xs font-bold tracking-[0.2em] uppercase opacity-70 mb-1">AI Generated</div>
-                                <div className="text-3xl font-bold leading-none">THE DEEP DIVE</div>
+                {/* Album Art Section */}
+                <div className="flex-1 flex flex-col items-center justify-center p-8">
+                    <div className="w-full aspect-square max-w-[320px] relative group">
+                        <div className="absolute inset-0 bg-[#137fec]/20 rounded-xl blur-2xl group-hover:blur-3xl transition-all opacity-50"></div>
+                        <div className="relative w-full h-full overflow-hidden rounded-xl shadow-2xl bg-gradient-to-br from-[#137fec] via-purple-500 to-pink-500 flex items-center justify-center">
+                            <div
+                                className="w-full h-full bg-center bg-no-repeat bg-cover opacity-90 mix-blend-overlay"
+                                style={{
+                                    backgroundImage: `url("${podcast.image}")`,
+                                }}
+                            />
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6">
+                                <span className="material-symbols-outlined text-6xl mb-4 opacity-80">graphic_eq</span>
+                                <div className="text-center">
+                                    <div className="text-xs font-bold tracking-[0.2em] uppercase opacity-70 mb-1">AI Generated</div>
+                                    <div className="text-3xl font-bold leading-none">THE DEEP DIVE</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Title & Metadata */}
-            <div className="px-8 text-center mb-8">
-                <h1 className="text-[#0d141b] dark:text-white text-3xl font-bold tracking-tight mb-2">{podcast.title}</h1>
-                <p className="text-[#0d141b]/60 dark:text-slate-400 text-sm font-medium">Source: {podcast.source}</p>
-            </div>
+                {/* Title & Metadata */}
+                <div className="px-8 text-center mb-8">
+                    <h1 className="text-[#0d141b] dark:text-white text-3xl font-bold tracking-tight mb-2">{podcast.title}</h1>
+                    <p className="text-[#0d141b]/60 dark:text-slate-400 text-sm font-medium">Source: {podcast.source}</p>
+                </div>
 
-            {/* Waveform Visualizer */}
-            <div className="px-8 mb-6">
-                <div className="flex items-end justify-center gap-1 h-16 w-full opacity-80">
-                    {waveformHeights.map((height, index) => (
+                {/* Waveform Visualizer */}
+                <div className="px-8 mb-6">
+                    <div className="flex items-end justify-center gap-1 h-16 w-full opacity-80">
+                        {waveformHeights.map((height, index) => (
+                            <div
+                                key={index}
+                                className="w-1 bg-[#137fec] rounded-full transition-all duration-300"
+                                style={{
+                                    height: `${height * 4}px`,
+                                    opacity: 0.3 + (height / 16) * 0.7,
+                                }}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="px-8 mb-8">
+                    <div className="flex flex-col gap-2">
                         <div
-                            key={index}
-                            className="w-1 bg-[#137fec] rounded-full transition-all duration-300"
-                            style={{
-                                height: `${height * 4}px`,
-                                opacity: 0.3 + (height / 16) * 0.7,
+                            className="h-1.5 w-full rounded-full bg-[#cfdbe7] dark:bg-slate-700 relative overflow-hidden cursor-pointer"
+                            onClick={(e) => {
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                const x = e.clientX - rect.left;
+                                const newProgress = (x / rect.width) * 100;
+                                setProgress(Math.max(0, Math.min(100, newProgress)));
                             }}
-                        />
-                    ))}
-                </div>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="px-8 mb-8">
-                <div className="flex flex-col gap-2">
-                    <div
-                        className="h-1.5 w-full rounded-full bg-[#cfdbe7] dark:bg-slate-700 relative overflow-hidden cursor-pointer"
-                        onClick={(e) => {
-                            const rect = e.currentTarget.getBoundingClientRect();
-                            const x = e.clientX - rect.left;
-                            const newProgress = (x / rect.width) * 100;
-                            setProgress(Math.max(0, Math.min(100, newProgress)));
-                        }}
-                    >
-                        <div
-                            className="absolute left-0 top-0 h-full bg-[#137fec] rounded-full transition-all duration-150"
-                            style={{ width: `${progress}%` }}
-                        />
-                    </div>
-                    <div className="flex justify-between">
-                        <p className="text-[#0d141b]/60 dark:text-slate-400 text-xs font-medium">{currentTime}</p>
-                        <p className="text-[#0d141b]/60 dark:text-slate-400 text-xs font-medium">{remainingTime}</p>
+                        >
+                            <div
+                                className="absolute left-0 top-0 h-full bg-[#137fec] rounded-full transition-all duration-150"
+                                style={{ width: `${progress}%` }}
+                            />
+                        </div>
+                        <div className="flex justify-between">
+                            <p className="text-[#0d141b]/60 dark:text-slate-400 text-xs font-medium">{currentTime}</p>
+                            <p className="text-[#0d141b]/60 dark:text-slate-400 text-xs font-medium">{remainingTime}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Playback Controls */}
-            <div className="px-8 pb-12">
-                <div className="flex items-center justify-between max-w-[280px] mx-auto mb-10">
-                    <button
-                        className="flex items-center justify-center size-12 text-[#0d141b] dark:text-white opacity-80 hover:opacity-100 transition-opacity active:scale-95"
-                        onClick={() => setProgress(Math.max(0, progress - 10))}
-                    >
-                        <span className="material-symbols-outlined text-3xl">replay_10</span>
-                    </button>
-                    <button
-                        className="flex items-center justify-center size-20 rounded-full bg-[#137fec] text-white shadow-xl shadow-[#137fec]/30 hover:scale-105 active:scale-95 transition-transform"
-                        onClick={togglePlayback}
-                    >
-                        <span className="material-symbols-outlined text-5xl filled">
-                            {isPlaying ? "pause" : "play_arrow"}
-                        </span>
-                    </button>
-                    <button
-                        className="flex items-center justify-center size-12 text-[#0d141b] dark:text-white opacity-80 hover:opacity-100 transition-opacity active:scale-95"
-                        onClick={() => setProgress(Math.min(100, progress + 10))}
-                    >
-                        <span className="material-symbols-outlined text-3xl">forward_10</span>
-                    </button>
-                </div>
-
-                {/* Bottom Actions */}
-                <div className="flex items-center justify-between">
-                    <button
-                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 hover:scale-105 active:scale-95 transition-transform"
-                        onClick={cycleSpeed}
-                    >
-                        <span className="material-symbols-outlined text-[#137fec] text-xl">speed</span>
-                        <span className="text-sm font-bold text-[#0d141b] dark:text-white">{playbackSpeed}x</span>
-                    </button>
-                    <div className="flex gap-4">
-                        <button className="flex items-center justify-center size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 text-[#0d141b] dark:text-white hover:scale-105 active:scale-95 transition-transform">
-                            <span className="material-symbols-outlined text-xl">playlist_add</span>
+                {/* Playback Controls */}
+                <div className="px-8 pb-12">
+                    <div className="flex items-center justify-between max-w-[280px] mx-auto mb-10">
+                        <button
+                            className="flex items-center justify-center size-12 text-[#0d141b] dark:text-white opacity-80 hover:opacity-100 transition-opacity active:scale-95"
+                            onClick={() => setProgress(Math.max(0, progress - 10))}
+                        >
+                            <span className="material-symbols-outlined text-3xl">replay_10</span>
                         </button>
-                        <button className="flex items-center justify-center size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 text-[#0d141b] dark:text-white hover:scale-105 active:scale-95 transition-transform">
-                            <span className="material-symbols-outlined text-xl">subtitles</span>
+                        <button
+                            className="flex items-center justify-center size-20 rounded-full bg-[#137fec] text-white shadow-xl shadow-[#137fec]/30 hover:scale-105 active:scale-95 transition-transform"
+                            onClick={togglePlayback}
+                        >
+                            <span className="material-symbols-outlined text-5xl filled">
+                                {isPlaying ? "pause" : "play_arrow"}
+                            </span>
+                        </button>
+                        <button
+                            className="flex items-center justify-center size-12 text-[#0d141b] dark:text-white opacity-80 hover:opacity-100 transition-opacity active:scale-95"
+                            onClick={() => setProgress(Math.min(100, progress + 10))}
+                        >
+                            <span className="material-symbols-outlined text-3xl">forward_10</span>
                         </button>
                     </div>
-                </div>
-            </div>
 
-            {/* iOS Indicator */}
-            <div className="flex justify-center pb-2">
-                <div className="w-32 h-1.5 bg-black/10 dark:bg-white/10 rounded-full"></div>
+                    {/* Bottom Actions */}
+                    <div className="flex items-center justify-between">
+                        <button
+                            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 hover:scale-105 active:scale-95 transition-transform"
+                            onClick={cycleSpeed}
+                        >
+                            <span className="material-symbols-outlined text-[#137fec] text-xl">speed</span>
+                            <span className="text-sm font-bold text-[#0d141b] dark:text-white">{playbackSpeed}x</span>
+                        </button>
+                        <div className="flex gap-4">
+                            <button className="flex items-center justify-center size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 text-[#0d141b] dark:text-white hover:scale-105 active:scale-95 transition-transform">
+                                <span className="material-symbols-outlined text-xl">playlist_add</span>
+                            </button>
+                            <button className="flex items-center justify-center size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 text-[#0d141b] dark:text-white hover:scale-105 active:scale-95 transition-transform">
+                                <span className="material-symbols-outlined text-xl">subtitles</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* iOS Indicator */}
+                <div className="flex justify-center pb-2">
+                    <div className="w-32 h-1.5 bg-black/10 dark:bg-white/10 rounded-full"></div>
+                </div>
             </div>
         </div>
     );
