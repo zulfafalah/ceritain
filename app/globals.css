@@ -49,3 +49,12 @@ body {
 .pastel-bg-2 {
   background: radial-gradient(circle at bottom right, #fef2f2, transparent 70%);
 }
+
+/* Pastel gradient for generating page */
+.pastel-gradient {
+  background: linear-gradient(135deg, #e0f2fe 0%, #f5f3ff 50%, #faf5ff 100%);
+}
+
+.dark .pastel-gradient {
+  background: linear-gradient(135deg, #101922 0%, #1e1b4b 100%);
+}

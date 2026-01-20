@@ -1,12 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import BottomNavigation from "@/components/BottomNavigation";
 
 export default function Home() {
+  const router = useRouter();
   const [mode, setMode] = useState<"text" | "url">("text");
   const [textContent, setTextContent] = useState("");
   const [urlValue, setUrlValue] = useState("");
+
+  const handleConvert = () => {
+    router.push("/generating");
+  };
 
   const wordCount = textContent
     .trim()
@@ -167,7 +173,10 @@ export default function Home() {
       <div className="fixed bottom-0 left-0 right-0 z-30">
         {/* Convert Button */}
         <div className="px-6 pb-6 pt-2 bg-gradient-to-t from-white/80 dark:from-slate-900/80 to-transparent">
-          <button className="flex w-full items-center justify-center gap-3 bg-[#137fec] hover:bg-[#137fec]/90 text-white rounded-full h-16 shadow-xl shadow-[#137fec]/30 transition-all active:scale-95">
+          <button
+            onClick={handleConvert}
+            className="flex w-full items-center justify-center gap-3 bg-[#137fec] hover:bg-[#137fec]/90 text-white rounded-full h-16 shadow-xl shadow-[#137fec]/30 transition-all active:scale-95"
+          >
             <span className="material-symbols-outlined text-2xl">
               auto_awesome
             </span>
