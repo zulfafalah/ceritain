@@ -82,43 +82,47 @@ export default function Home() {
 
         {/* Form Fields */}
         <div className="mt-4 flex flex-col gap-6">
-          {/* Article Content */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between px-1">
-              <p className="text-[#0d141b] dark:text-white text-base font-semibold">
-                Article Content
-              </p>
-              <span className="text-xs font-medium text-slate-400">
-                {wordCount} / 5000 words
-              </span>
+          {/* Article Content - Show only when mode is "text" */}
+          {mode === "text" && (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between px-1">
+                <p className="text-[#0d141b] dark:text-white text-base font-semibold">
+                  Article Content
+                </p>
+                <span className="text-xs font-medium text-slate-400">
+                  {wordCount} / 5000 words
+                </span>
+              </div>
+              <label className="flex flex-col flex-1">
+                <textarea
+                  className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d141b] dark:text-white focus:outline-0 focus:ring-2 focus:ring-[#137fec]/20 border border-white dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm min-h-[220px] placeholder:text-slate-400 p-5 text-base font-normal leading-relaxed shadow-sm"
+                  placeholder="Paste that 10-minute read you've been avoiding..."
+                  value={textContent}
+                  onChange={(e) => setTextContent(e.target.value)}
+                />
+              </label>
             </div>
-            <label className="flex flex-col flex-1">
-              <textarea
-                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d141b] dark:text-white focus:outline-0 focus:ring-2 focus:ring-[#137fec]/20 border border-white dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm min-h-[220px] placeholder:text-slate-400 p-5 text-base font-normal leading-relaxed shadow-sm"
-                placeholder="Paste that 10-minute read you've been avoiding..."
-                value={textContent}
-                onChange={(e) => setTextContent(e.target.value)}
-              />
-            </label>
-          </div>
+          )}
 
-          {/* Website URL */}
-          <div className="flex flex-col gap-2">
-            <p className="text-[#0d141b] dark:text-white text-base font-semibold px-1">
-              Website URL
-            </p>
-            <div className="flex w-full flex-1 items-stretch rounded-xl shadow-sm overflow-hidden">
-              <input
-                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-l-xl text-[#0d141b] dark:text-white focus:outline-0 focus:ring-2 focus:ring-[#137fec]/20 border border-white dark:border-slate-700 border-r-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm h-14 placeholder:text-slate-400 p-5 text-base font-normal transition-all"
-                placeholder="https://example.com/article"
-                value={urlValue}
-                onChange={(e) => setUrlValue(e.target.value)}
-              />
-              <div className="text-[#137fec] flex border border-white dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm items-center justify-center pr-5 rounded-r-xl border-l-0">
-                <span className="material-symbols-outlined">link</span>
+          {/* Website URL - Show only when mode is "url" */}
+          {mode === "url" && (
+            <div className="flex flex-col gap-2">
+              <p className="text-[#0d141b] dark:text-white text-base font-semibold px-1">
+                Website URL
+              </p>
+              <div className="flex w-full flex-1 items-stretch rounded-xl shadow-sm overflow-hidden">
+                <input
+                  className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-l-xl text-[#0d141b] dark:text-white focus:outline-0 focus:ring-2 focus:ring-[#137fec]/20 border border-white dark:border-slate-700 border-r-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm h-14 placeholder:text-slate-400 p-5 text-base font-normal transition-all"
+                  placeholder="https://example.com/article"
+                  value={urlValue}
+                  onChange={(e) => setUrlValue(e.target.value)}
+                />
+                <div className="text-[#137fec] flex border border-white dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm items-center justify-center pr-5 rounded-r-xl border-l-0">
+                  <span className="material-symbols-outlined">link</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Trending Topics */}
           <div className="mt-4">
