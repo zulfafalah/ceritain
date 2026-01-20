@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import BottomNavigation from "@/components/BottomNavigation";
 
 export default function Home() {
   const [mode, setMode] = useState<"text" | "url">("text");
@@ -175,45 +176,7 @@ export default function Home() {
         </div>
 
         {/* Bottom Navigation */}
-        <nav className="h-20 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 flex justify-around items-center px-4 pb-4">
-          <a
-            className="flex flex-col items-center gap-1 group transition-all"
-            href="#"
-          >
-            <div className="p-1 rounded-xl bg-[#137fec]/10 text-[#137fec]">
-              <span className="material-symbols-outlined filled text-2xl">
-                home
-              </span>
-            </div>
-            <span className="text-[10px] font-bold text-[#137fec] uppercase tracking-tighter">
-              Home
-            </span>
-          </a>
-          <a
-            className="flex flex-col items-center gap-1 group transition-all"
-            href="#"
-          >
-            <div className="p-1 rounded-xl text-slate-400 dark:text-slate-500 group-hover:text-[#137fec] transition-colors">
-              <span className="material-symbols-outlined text-2xl">
-                library_music
-              </span>
-            </div>
-            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">
-              Library
-            </span>
-          </a>
-          <a
-            className="flex flex-col items-center gap-1 group transition-all"
-            href="#"
-          >
-            <div className="p-1 rounded-xl text-slate-400 dark:text-slate-500 group-hover:text-[#137fec] transition-colors">
-              <span className="material-symbols-outlined text-2xl">person</span>
-            </div>
-            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">
-              Profile
-            </span>
-          </a>
-        </nav>
+        <BottomNavigation />
       </div>
     </div>
   );
