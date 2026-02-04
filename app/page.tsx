@@ -21,7 +21,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full bg-[#f6f7f8] dark:bg-[#101922] flex justify-center">
-      <div className="relative flex min-h-screen w-full max-w-[480px] flex-col overflow-x-hidden pastel-bg-1 bg-[#f6f7f8] dark:bg-[#101922] text-[#0d141b] dark:text-slate-100 transition-colors duration-300">
+      <div className="relative flex min-h-screen w-full max-w-[480px] flex-col overflow-x-hidden pastel-bg-1 pastel-gradient text-[#0d141b] dark:text-slate-100 transition-colors duration-300">
         <div className="absolute inset-0 pastel-bg-2 pointer-events-none"></div>
 
         {/* Header */}
