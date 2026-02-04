@@ -121,17 +121,16 @@ export default function ProfilePage() {
 
                             {/* Log Out */}
                             <button
-                                className="backdrop-blur-md p-4 rounded-2xl flex items-center gap-4 active:scale-[0.98] transition-all group mt-2"
-                                style={{ backgroundColor: "rgba(254, 242, 242, 0.5)", border: "1px solid #fee2e2" }}
+                                className="backdrop-blur-md p-4 rounded-2xl flex items-center gap-4 active:scale-[0.98] transition-all group mt-2 bg-red-50/50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50"
                             >
                                 <div
-                                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                    style={{ backgroundColor: "#fee2e2", color: "#ef4444" }}
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center bg-red-100 dark:bg-red-900/60"
+                                    style={{ color: "#ef4444" }}
                                 >
                                     <span className="material-symbols-outlined">logout</span>
                                 </div>
                                 <div className="flex-1 text-left">
-                                    <h4 className="text-sm font-bold" style={{ color: "#ef4444" }}>Log Out</h4>
+                                    <h4 className="text-sm font-bold text-red-500">Log Out</h4>
                                 </div>
                             </button>
                         </div>
