@@ -50,7 +50,9 @@ export default function GeneratingPage() {
 
     return (
         <div className="h-screen w-full bg-[#f6f7f8] dark:bg-[#101922] flex justify-center">
-            <div className="relative flex h-screen w-full max-w-[480px] flex-col overflow-hidden pastel-gradient bg-[#f6f7f8] dark:bg-[#101922] text-[#0d141b] dark:text-slate-100">
+            <div className="relative flex h-screen w-full max-w-[480px] flex-col overflow-hidden pastel-bg-1 pastel-gradient bg-[#f6f7f8] dark:bg-[#101922] text-[#0d141b] dark:text-slate-100">
+                <div className="absolute inset-0 pastel-bg-2 pointer-events-none"></div>
+
                 {/* Top Navigation */}
                 <div className="flex items-center p-4 pb-2 justify-between">
                     <div

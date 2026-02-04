@@ -47,7 +47,7 @@ body {
 }
 
 .pastel-bg-2 {
-  background: radial-gradient(circle at bottom right, #fef2f2, transparent 70%);
+  background: radial-gradient(circle at bottom right, #fef8f8, transparent 70%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -67,8 +67,8 @@ body {
   .pastel-gradient {
     background:
       radial-gradient(ellipse 120% 80% at -10% -20%, #1a6b7c 0%, #0e4a5a 20%, transparent 55%),
-      radial-gradient(ellipse 120% 60% at 80% 100%, #8b2a6b 0%, #6b1f55 20%, #4a1540 40%, transparent 70%),
-      radial-gradient(ellipse 100% 50% at 40% 105%, #5c1d4a 0%, #3d1535 30%, transparent 65%),
+      radial-gradient(ellipse 120% 60% at 80% 100%, #5a1d48 0%, #481838 20%, #351230 40%, transparent 70%),
+      radial-gradient(ellipse 100% 50% at 40% 105%, #401530 0%, #2d1025 30%, transparent 65%),
       linear-gradient(180deg, #071525 0%, #0a1a2e 35%, #0d1f3a 55%, #120f28 80%, #1a0f2e 100%);
   }
 }
