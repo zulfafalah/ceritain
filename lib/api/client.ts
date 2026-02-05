@@ -1,7 +1,7 @@
 // Base API Client with interceptor pattern
 // Centralized HTTP client for all API calls
 
-const API_BASE_URL = "https://palpal.zulfafalah.my.id/api/v1/ceritain";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
 // Custom API Error class for better error handling
 export class ApiError extends Error {
