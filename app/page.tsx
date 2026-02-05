@@ -3,15 +3,60 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import BottomNavigation from "@/components/BottomNavigation";
+import { storyNarrationApi, ApiError } from "@/lib/api";
 
 export default function Home() {
   const router = useRouter();
   const [mode, setMode] = useState<"text" | "url">("text");
   const [textContent, setTextContent] = useState("");
   const [urlValue, setUrlValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleConvert = () => {
-    router.push("/generating");
+  const handleConvert = async () => {
+    // Validate input
+    if (mode === "text" && !textContent.trim()) {
+      setError("Please enter some text content");
+      return;
+    }
+    if (mode === "url" && !urlValue.trim()) {
+      setError("Please enter a URL");
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      let response;
+      if (mode === "text") {
+        response = await storyNarrationApi.create(textContent);
+      } else {
+        response = await storyNarrationApi.createFromUrl(urlValue);
+      }
+
+      // Store task info in localStorage for the generating page
+      localStorage.setItem(
+        "currentTask",
+        JSON.stringify({
+          task_id: response.task_id,
+          story_narration_id: response.story_narration_id,
+          status: response.status,
+        })
+      );
+
+      // Navigate to generating page
+      router.push("/generating");
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+      console.error("Error creating narration:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const wordCount = textContent
@@ -179,14 +224,32 @@ export default function Home() {
           <div className="w-full max-w-[480px]">
             {/* Convert Button */}
             <div className="px-6 pb-6 pt-2 bg-gradient-to-t from-white/80 dark:from-slate-900/80 to-transparent">
+              {/* Error Message */}
+              {error && (
+                <div className="mb-3 px-4 py-3 rounded-xl bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm font-medium text-center">
+                  {error}
+                </div>
+              )}
               <button
                 onClick={handleConvert}
-                className="flex w-full items-center justify-center gap-3 bg-[#137fec] hover:bg-[#137fec]/90 text-white rounded-full h-16 shadow-xl shadow-[#137fec]/30 transition-all active:scale-95"
+                disabled={isLoading}
+                className="flex w-full items-center justify-center gap-3 bg-[#137fec] hover:bg-[#137fec]/90 disabled:bg-[#137fec]/50 disabled:cursor-not-allowed text-white rounded-full h-16 shadow-xl shadow-[#137fec]/30 transition-all active:scale-95 disabled:active:scale-100"
               >
-                <span className="material-symbols-outlined text-2xl">
-                  auto_awesome
-                </span>
-                <span className="text-lg font-bold">Convert to Podcast</span>
+                {isLoading ? (
+                  <>
+                    <span className="material-symbols-outlined text-2xl animate-spin">
+                      progress_activity
+                    </span>
+                    <span className="text-lg font-bold">Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-2xl">
+                      auto_awesome
+                    </span>
+                    <span className="text-lg font-bold">Convert to Podcast</span>
+                  </>
+                )}
               </button>
             </div>
 
