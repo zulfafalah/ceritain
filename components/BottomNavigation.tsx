@@ -30,8 +30,8 @@ export default function BottomNavigation() {
                     >
                         <div
                             className={`p-1 rounded-xl transition-colors ${isActive
-                                    ? "bg-[#137fec]/10 text-[#137fec]"
-                                    : "text-slate-400 dark:text-slate-500 group-hover:text-[#137fec]"
+                                ? "bg-[#137fec]/10 text-[#137fec]"
+                                : "text-slate-400 dark:text-slate-500 group-hover:text-[#137fec]"
                                 }`}
                         >
                             <span
@@ -43,8 +43,8 @@ export default function BottomNavigation() {
                         </div>
                         <span
                             className={`text-[10px] font-bold uppercase tracking-tighter ${isActive
-                                    ? "text-[#137fec]"
-                                    : "text-slate-400 dark:text-slate-500"
+                                ? "text-[#137fec]"
+                                : "text-slate-400 dark:text-slate-500"
                                 }`}
                         >
                             {item.label}
