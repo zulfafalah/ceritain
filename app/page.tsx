@@ -164,7 +164,7 @@ export default function Home() {
                     onChange={(e) => setUrlValue(e.target.value)}
                   />
                   <div className="text-[#137fec] flex border border-white dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm items-center justify-center pr-5 rounded-r-xl border-l-0">
-                    <span className="material-symbols-outlined">link</span>
+                    <span className="material-symbols-outlined text-2xl">link</span>
                   </div>
                 </div>
               </div>
