@@ -284,7 +284,7 @@ export default function ProfileV2Page() {
 
                     {/* Version */}
                     <p className="text-center text-[10px] text-slate-400 dark:text-slate-600 mt-10">
-                        Profile V2 • Fingerprint Identity
+                        v1.0.0
                     </p>
                 </main>
 
