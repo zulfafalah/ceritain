@@ -131,8 +131,7 @@ export default function ProfileV2Page() {
                         <div className="flex flex-col gap-2">
                             {/* Fingerprint ID */}
                             <div
-                                className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 rounded-2xl flex items-center gap-4"
-                                style={{ border: "1px solid rgba(255,255,255,0.5)" }}
+                                className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 rounded-2xl border border-white/50 dark:border-slate-700/50 flex items-center gap-4"
                             >
                                 <div
                                     className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -166,8 +165,7 @@ export default function ProfileV2Page() {
 
                             {/* Confidence Score */}
                             <div
-                                className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 rounded-2xl flex items-center gap-4"
-                                style={{ border: "1px solid rgba(255,255,255,0.5)" }}
+                                className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 rounded-2xl border border-white/50 dark:border-slate-700/50 flex items-center gap-4"
                             >
                                 <div
                                     className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -201,8 +199,7 @@ export default function ProfileV2Page() {
 
                             {/* Browser Info */}
                             <div
-                                className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 rounded-2xl flex items-center gap-4"
-                                style={{ border: "1px solid rgba(255,255,255,0.5)" }}
+                                className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 rounded-2xl border border-white/50 dark:border-slate-700/50 flex items-center gap-4"
                             >
                                 <div
                                     className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -222,8 +219,7 @@ export default function ProfileV2Page() {
 
                             {/* Device Type */}
                             <div
-                                className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 rounded-2xl flex items-center gap-4"
-                                style={{ border: "1px solid rgba(255,255,255,0.5)" }}
+                                className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 rounded-2xl border border-white/50 dark:border-slate-700/50 flex items-center gap-4"
                             >
                                 <div
                                     className="w-10 h-10 rounded-xl flex items-center justify-center"
