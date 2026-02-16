@@ -311,7 +311,18 @@ function PlayerContent() {
                 <div className="px-8 text-center mb-8">
                     <h1 className="text-[#0d141b] dark:text-white text-3xl font-bold tracking-tight mb-2">{narrationData.title}</h1>
                     <p className="text-[#0d141b]/60 dark:text-slate-400 text-sm font-medium">
-                        {narrationData.source_url ? `Source: ${new URL(narrationData.source_url).hostname}` : `${narrationData.estimated_read_time_formatted} read`}
+                        {narrationData.source_url ? (
+                            <a
+                                href={narrationData.source_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-[#137fec] transition-colors"
+                            >
+                                Source: {new URL(narrationData.source_url).hostname}
+                            </a>
+                        ) : (
+                            `${narrationData.estimated_read_time_formatted} read`
+                        )}
                     </p>
                 </div>
 
