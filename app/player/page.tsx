@@ -378,7 +378,7 @@ function PlayerContent() {
                                 className="flex items-center justify-center size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 text-[#0d141b] dark:text-white hover:scale-105 active:scale-95 transition-transform"
                                 onClick={handleMinimize}
                             >
-                                <span className="material-symbols-outlined text-xl">remove</span>
+                                <span className="material-symbols-outlined text-xl">subtitles</span>
                             </button>
                         </div>
                     </div>

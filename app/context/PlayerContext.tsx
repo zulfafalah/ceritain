@@ -16,6 +16,7 @@ interface PlayerContextType {
     setPlaybackSpeed: (speed: number) => void;
     playPodcast: (id: number) => Promise<void>;
     seek: (time: number) => void;
+    closePlayer: () => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -93,7 +94,12 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
                 await audioRef.current.play();
                 setIsPlaying(true);
             }
-        } catch (err) {
+        } catch (err: any) {
+            // Ignore AbortError as it happens when play is interrupted by pause or load
+            if (err.name === 'AbortError') {
+                console.log("Playback aborted");
+                return;
+            }
             console.error("Failed to play podcast:", err);
             setError("Failed to load podcast");
             setIsPlaying(false);
@@ -117,6 +123,16 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         audioRef.current.currentTime = time;
     };
 
+    const closePlayer = () => {
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+        }
+        setIsPlaying(false);
+        setCurrentPodcastId(null);
+        setNarrationData(null);
+    };
+
     return (
         <PlayerContext.Provider
             value={{
@@ -131,6 +147,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
                 setPlaybackSpeed,
                 playPodcast,
                 seek,
+                closePlayer,
             }}
         >
             {children}

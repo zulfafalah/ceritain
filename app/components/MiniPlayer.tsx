@@ -10,7 +10,8 @@ export default function MiniPlayer() {
         isPlaying,
         togglePlayback,
         narrationData,
-        isLoading
+        isLoading,
+        closePlayer
     } = usePlayer();
 
     const router = useRouter();
@@ -40,9 +41,9 @@ export default function MiniPlayer() {
     };
 
     return (
-        <div className={`fixed ${positionClass} left-0 right-0 z-50 p-2 pb-safe bg-gradient-to-t from-white/90 to-white/90 dark:from-[#101922]/90 dark:to-[#101922]/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 shadow-lg transition-all duration-300`}>
+        <div className={`fixed ${positionClass} left-0 right-0 z-50 p-2 pb-safe transition-all duration-300 pointer-events-none`}>
             <div
-                className="max-w-[480px] mx-auto flex items-center gap-3 p-2 pr-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                className="max-w-[480px] mx-auto flex items-center gap-3 p-2 pr-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors pointer-events-auto"
                 onClick={handleExpandWrapper}
             >
                 {/* Album Art (Small) */}
@@ -76,6 +77,19 @@ export default function MiniPlayer() {
                 >
                     <span className="material-symbols-outlined text-xl filled">
                         {isPlaying ? "pause" : "play_arrow"}
+                    </span>
+                </button>
+
+                {/* Close Button */}
+                <button
+                    className="flex items-center justify-center size-8 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors shrink-0"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        closePlayer();
+                    }}
+                >
+                    <span className="material-symbols-outlined text-xl">
+                        close
                     </span>
                 </button>
             </div>
