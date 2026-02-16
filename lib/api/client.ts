@@ -83,7 +83,7 @@ export const apiClient = {
         const response = await fetch(url, {
             method: "POST",
             headers: { ...getDefaultHeaders(), ...config?.headers },
-            body: data ? JSON.stringify(data) : undefined,
+            body: data instanceof URLSearchParams ? data.toString() : (data ? JSON.stringify(data) : undefined),
             ...config,
         });
         return handleResponse<T>(response);

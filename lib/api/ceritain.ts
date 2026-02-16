@@ -4,15 +4,27 @@
 import { apiClient } from "./client";
 import type {
     CreateNarrationResponse,
-    StoryNarration,
-    StoryNarrationListParams,
-    PaginatedResponse,
-    TaskStatusResponse,
     TrendingStory,
     LibraryStoryNarration,
     LibraryListParams,
     StoryNarrationStatusResponse,
 } from "./types";
+
+/**
+ * Get browser fingerprint from localStorage
+ * @returns fingerprint visitorId or empty string if not found
+ */
+function getBrowserFingerprint(): string {
+    if (typeof window === "undefined") return "";
+    const cached = localStorage.getItem("fingerprint_data");
+    if (!cached) return "";
+    try {
+        const data = JSON.parse(cached);
+        return data.visitorId || "";
+    } catch {
+        return "";
+    }
+}
 
 /**
  * Story Narration API endpoints
@@ -24,40 +36,43 @@ export const storyNarrationApi = {
      * @param content_text - The text content to narrate
      */
     create(content_text: string): Promise<CreateNarrationResponse> {
+        const fingerprint = getBrowserFingerprint();
+        const formData = new URLSearchParams();
+        formData.append("content_text", content_text);
+        formData.append("source_url", "");
+
         return apiClient.post<CreateNarrationResponse>(
-            "/story-narration/create",
-            { content_text }
+            "/api/v1/ceritain/story-narration/create",
+            formData,
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-Client-Fingerprint": fingerprint,
+                },
+            }
         );
     },
 
     /**
      * Create story narration from URL
-     * @param url - The URL to fetch content from
+     * @param source_url - The URL to fetch content from
      */
-    createFromUrl(url: string): Promise<CreateNarrationResponse> {
+    createFromUrl(source_url: string): Promise<CreateNarrationResponse> {
+        const fingerprint = getBrowserFingerprint();
+        const formData = new URLSearchParams();
+        formData.append("content_text", "");
+        formData.append("source_url", source_url);
+
         return apiClient.post<CreateNarrationResponse>(
-            "/story-narration/create-from-url/",
-            { url }
+            "/api/v1/ceritain/story-narration/create",
+            formData,
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-Client-Fingerprint": fingerprint,
+                },
+            }
         );
-    },
-
-    /**
-     * Get list of story narrations with pagination and filtering
-     * @param params - Optional filter and pagination parameters
-     */
-    list(params?: StoryNarrationListParams): Promise<PaginatedResponse<StoryNarration>> {
-        return apiClient.get<PaginatedResponse<StoryNarration>>(
-            "/story-narration/",
-            { params }
-        );
-    },
-
-    /**
-     * Get a single story narration by ID
-     * @param id - The story narration ID
-     */
-    getById(id: number): Promise<StoryNarration> {
-        return apiClient.get<StoryNarration>(`/story-narration/${id}/`);
     },
 
     /**
@@ -67,30 +82,6 @@ export const storyNarrationApi = {
      */
     getStatus(id: number): Promise<StoryNarrationStatusResponse> {
         return apiClient.get<StoryNarrationStatusResponse>(`/api/v1/ceritain/story-narration/${id}/status`);
-    },
-
-    /**
-     * Get task status for a story narration
-     * @param taskId - The celery task ID
-     */
-    getTaskStatus(taskId: string): Promise<TaskStatusResponse> {
-        return apiClient.get<TaskStatusResponse>(`/task-status/${taskId}/`);
-    },
-
-    /**
-     * Stream audio for a story narration (SSE)
-     * @param id - The story narration ID
-     */
-    stream(id: number): Promise<Response> {
-        return apiClient.stream(`/story-narration/${id}/stream/`);
-    },
-
-    /**
-     * Delete a story narration
-     * @param id - The story narration ID
-     */
-    delete(id: number): Promise<void> {
-        return apiClient.delete<void>(`/story-narration/${id}/`);
     },
 
     /**

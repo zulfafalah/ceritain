@@ -5,18 +5,11 @@ export { apiClient, ApiError } from "./client";
 
 // Types
 export type {
-    PaginatedResponse,
-    ListParams,
-    StoryNarration,
-    StoryNarrationStatus,
-    StoryNarrationListParams,
     CreateNarrationResponse,
-    CreateNarrationParams,
-    CreateNarrationFromUrlParams,
-    TaskStatusResponse,
     TrendingStory,
     LibraryStoryNarration,
     LibraryListParams,
+    StoryNarrationStatusResponse,
 } from "./types";
 
 // API Services
