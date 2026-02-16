@@ -25,9 +25,37 @@ interface RequestConfig extends Omit<RequestInit, "body"> {
 async function handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
         const errorData = await response.json().catch(() => null);
+
+        // Extract error message from various formats
+        let errorMessage = `Request failed with status ${response.status}`;
+
+        if (errorData) {
+            // Check for standard message or detail field
+            if (errorData.message) {
+                errorMessage = errorData.message;
+            } else if (errorData.detail) {
+                errorMessage = errorData.detail;
+            }
+            // Check for validation errors in format: { "error": { "field_name": ["error message"] } }
+            else if (errorData.error && typeof errorData.error === 'object') {
+                const errors: string[] = [];
+                for (const field in errorData.error) {
+                    const fieldErrors = errorData.error[field];
+                    if (Array.isArray(fieldErrors)) {
+                        errors.push(...fieldErrors);
+                    } else if (typeof fieldErrors === 'string') {
+                        errors.push(fieldErrors);
+                    }
+                }
+                if (errors.length > 0) {
+                    errorMessage = errors.join(', ');
+                }
+            }
+        }
+
         throw new ApiError(
             response.status,
-            errorData?.message || errorData?.detail || `Request failed with status ${response.status}`,
+            errorMessage,
             errorData
         );
     }
