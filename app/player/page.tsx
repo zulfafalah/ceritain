@@ -19,6 +19,8 @@ function PlayerContent() {
     const [playbackSpeed, setPlaybackSpeed] = useState(1.5);
     const [waveformHeights, setWaveformHeights] = useState<number[]>([]);
     const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
 
     // Fetch narration data
     useEffect(() => {
@@ -133,6 +135,14 @@ function PlayerContent() {
         setProgress(newProgress);
     };
 
+    const showToastNotification = (message: string) => {
+        setToastMessage(message);
+        setShowToast(true);
+        setTimeout(() => {
+            setShowToast(false);
+        }, 3000);
+    };
+
     const handleShare = async () => {
         if (!narrationData) return;
 
@@ -151,7 +161,7 @@ function PlayerContent() {
                 // Fallback: Copy to clipboard
                 await navigator.clipboard.writeText(shareUrl);
                 // Show toast notification
-                alert("Link copied to clipboard!");
+                showToastNotification("Link copied to clipboard!");
             }
         } catch (error) {
             // User cancelled share or error occurred
@@ -160,9 +170,10 @@ function PlayerContent() {
                 // Fallback to clipboard
                 try {
                     await navigator.clipboard.writeText(shareUrl);
-                    alert("Link copied to clipboard!");
+                    showToastNotification("Link copied to clipboard!");
                 } catch (clipboardError) {
                     console.error("Clipboard error:", clipboardError);
+                    showToastNotification("Failed to copy link");
                 }
             }
         }
@@ -245,6 +256,18 @@ function PlayerContent() {
     return (
         <div className="min-h-screen w-full bg-[#f6f7f8] dark:bg-[#101922] flex justify-center">
             <div className="relative flex min-h-screen w-full max-w-[480px] flex-col overflow-hidden shadow-2xl bg-[#f6f7f8] dark:bg-[#101922]">
+                {/* Toast Notification */}
+                {showToast && (
+                    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-slideDown">
+                        <div className="bg-white dark:bg-slate-800 shadow-lg rounded-full px-6 py-3 flex items-center gap-3 border border-green-500/20">
+                            <div className="flex items-center justify-center size-6 rounded-full bg-green-500/10">
+                                <span className="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+                            </div>
+                            <p className="text-sm font-medium text-[#0d141b] dark:text-white">{toastMessage}</p>
+                        </div>
+                    </div>
+                )}
+
                 {/* Top Navigation */}
                 <div className="flex items-center p-6 pb-2 justify-between">
                     <Link
