@@ -9,6 +9,8 @@ import type {
     PaginatedResponse,
     TaskStatusResponse,
     TrendingStory,
+    LibraryStoryNarration,
+    LibraryListParams,
 } from "./types";
 
 /**
@@ -87,6 +89,15 @@ export const storyNarrationApi = {
      */
     getTrending(): Promise<TrendingStory[]> {
         return apiClient.get<TrendingStory[]>("/api/v1/ceritain/story-narration/trending");
+    },
+
+    /**
+     * Get user's library of story narrations
+     * @param params - Optional search and filter parameters
+     * @returns Array of library story narrations
+     */
+    getLibrary(params?: LibraryListParams): Promise<LibraryStoryNarration[]> {
+        return apiClient.get<LibraryStoryNarration[]>("/api/v1/ceritain/story-narration/", { params });
     },
 };
 

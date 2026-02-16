@@ -1,67 +1,79 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import BottomNavigation from "@/components/BottomNavigation";
-
-interface PodcastItem {
-    id: number;
-    title: string;
-    duration: string;
-    status: "in-progress" | "completed";
-    date?: string;
-    image: string;
-    imageFilter?: string;
-    opacity?: boolean;
-}
-
-const podcastLibrary: PodcastItem[] = [
-    {
-        id: 1,
-        title: "The Future of AI",
-        duration: "12:05",
-        status: "in-progress",
-        image:
-            "https://lh3.googleusercontent.com/aida-public/AB6AXuASXQ0A_d2mJX-AV5VGiaAauguL9perBvjqHZe33Th2h-XxhgSoTpnt50z1E82r2kRopnk_wWcqJ9J_ZsZX_iTijmsKA6ZvX08o3nNFJzmh2tdFhmU8D-KORe7vpEN2k344tcY9VKWaclmHrrbJy-9gvPL1hfzg6wluFOMUTZc_z9De7IX0N0JAxbncToUcJwclMUdmMc-NCNjCxl_lSrHeymeZmA0NxhFptcZkVytoqwH_-wYpSDwkL20d7wHF_hTjbLedh6GVbQ",
-    },
-    {
-        id: 2,
-        title: "Mindfulness Hacks for Gen Z",
-        duration: "08:42",
-        status: "completed",
-        date: "Yesterday",
-        image:
-            "https://lh3.googleusercontent.com/aida-public/AB6AXuBhffgmtTFcSyxqOWxS9NpVZIx2fW5m1ee2HxMITp2OUKF-vIpghLC1csAbxdSonw-nQ8PYNHpt-4rFQbyg4GUihTk4rnt-A8QSWfNLhjZ_aUNG63WWeA8qf6JtKq-ynU0uf7u9eSmGeqghgjlMS1Pvb55isr-VipwKoPCIPa-06IPUQAoFS1QKl9m8FjyljvqsTirQNjGIW5B21iDIipbKIUb4OucX4T8xPnqqNbQd-bNa0V0rBBycrJWdezROrwKvUDgmIXzl3g",
-    },
-    {
-        id: 3,
-        title: "Sustainable Fashion FAQ",
-        duration: "15:20",
-        status: "completed",
-        date: "2 days ago",
-        image:
-            "https://lh3.googleusercontent.com/aida-public/AB6AXuASXQ0A_d2mJX-AV5VGiaAauguL9perBvjqHZe33Th2h-XxhgSoTpnt50z1E82r2kRopnk_wWcqJ9J_ZsZX_iTijmsKA6ZvX08o3nNFJzmh2tdFhmU8D-KORe7vpEN2k344tcY9VKWaclmHrrbJy-9gvPL1hfzg6wluFOMUTZc_z9De7IX0N0JAxbncToUcJwclMUdmMc-NCNjCxl_lSrHeymeZmA0NxhFptcZkVytoqwH_-wYpSDwkL20d7wHF_hTjbLedh6GVbQ",
-        imageFilter: "hue-rotate(90deg)",
-    },
-    {
-        id: 4,
-        title: "The Rise of Remote Work",
-        duration: "21:30",
-        status: "completed",
-        date: "Last week",
-        image:
-            "https://lh3.googleusercontent.com/aida-public/AB6AXuBhffgmtTFcSyxqOWxS9NpVZIx2fW5m1ee2HxMITp2OUKF-vIpghLC1csAbxdSonw-nQ8PYNHpt-4rFQbyg4GUihTk4rnt-A8QSWfNLhjZ_aUNG63WWeA8qf6JtKq-ynU0uf7u9eSmGeqghgjlMS1Pvb55isr-VipwKoPCIPa-06IPUQAoFS1QKl9m8FjyljvqsTirQNjGIW5B21iDIipbKIUb4OucX4T8xPnqqNbQd-bNa0V0rBBycrJWdezROrwKvUDgmIXzl3g",
-        imageFilter: "saturate(0.5)",
-        opacity: true,
-    },
-];
+import { storyNarrationApi, LibraryStoryNarration } from "@/lib/api";
+import { useFingerprint } from "@/lib/useFingerprint";
 
 export default function LibraryPage() {
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+    const [library, setLibrary] = useState<LibraryStoryNarration[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const { fingerprint, isLoading: fingerprintLoading } = useFingerprint();
 
-    const filteredPodcasts = podcastLibrary.filter((podcast) =>
-        podcast.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Debounce search query
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 500); // 500ms delay
+
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [searchQuery]);
+
+    // Fetch library data
+    useEffect(() => {
+        const fetchLibrary = async () => {
+            if (fingerprintLoading || !fingerprint) {
+                return;
+            }
+
+            setIsLoading(true);
+            setError(null);
+
+            try {
+                const data = await storyNarrationApi.getLibrary({
+                    created_by: fingerprint.visitorId,
+                    search: debouncedSearchQuery || undefined,
+                });
+                setLibrary(data);
+            } catch (err) {
+                console.error("Failed to fetch library:", err);
+                setError("Failed to load your library. Please try again.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchLibrary();
+    }, [fingerprint, fingerprintLoading, debouncedSearchQuery]);
+
+    // Format duration from estimated_read_time
+    const formatDuration = (item: LibraryStoryNarration) => {
+        return item.estimated_read_time_formatted || `${item.estimated_read_time} Sec`;
+    };
+
+    // Get status display
+    const getStatus = (item: LibraryStoryNarration): "in-progress" | "completed" => {
+        return item.status === "done" ? "completed" : "in-progress";
+    };
+
+    // Format date
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+
+        if (diffInDays === 0) return "Today";
+        if (diffInDays === 1) return "Yesterday";
+        if (diffInDays < 7) return `${diffInDays} days ago`;
+        if (diffInDays < 14) return "Last week";
+        return date.toLocaleDateString();
+    };
 
     return (
         <div className="min-h-screen w-full bg-[#f6f7f8] dark:bg-[#101922] flex justify-center">
@@ -119,23 +131,37 @@ export default function LibraryPage() {
                             My Library
                         </h3>
 
-                        {filteredPodcasts.map((podcast) => (
+                        {/* Loading State */}
+                        {isLoading && (
+                            <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+                                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#137fec] mb-3"></div>
+                                <p className="text-sm font-medium">Loading your library...</p>
+                            </div>
+                        )}
+
+                        {/* Error State */}
+                        {error && !isLoading && (
+                            <div className="flex flex-col items-center justify-center py-12 text-red-500">
+                                <span className="material-symbols-outlined text-4xl mb-2">
+                                    error
+                                </span>
+                                <p className="text-sm font-medium">{error}</p>
+                            </div>
+                        )}
+
+                        {/* Library Items */}
+                        {!isLoading && !error && library.map((item) => (
                             <Link
-                                key={podcast.id}
-                                href={`/player?id=${podcast.id}`}
-                                className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 rounded-2xl border border-white/50 dark:border-slate-700/50 flex items-center gap-4 shadow-sm group active:scale-[0.98] transition-all cursor-pointer ${podcast.opacity ? "opacity-80" : ""
-                                    }`}
+                                key={item.id}
+                                href={`/player?id=${item.id}`}
+                                className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 rounded-2xl border border-white/50 dark:border-slate-700/50 flex items-center gap-4 shadow-sm group active:scale-[0.98] transition-all cursor-pointer"
                             >
                                 {/* Thumbnail */}
                                 <div className="relative w-16 h-16 shrink-0 rounded-xl overflow-hidden shadow-md">
                                     <div
-                                        className={`w-full h-full bg-center bg-cover ${podcast.imageFilter?.includes("hue-rotate")
-                                            ? "bg-[#137fec]/20"
-                                            : ""
-                                            }`}
+                                        className="w-full h-full bg-center bg-cover"
                                         style={{
-                                            backgroundImage: `url("${podcast.image}")`,
-                                            filter: podcast.imageFilter || undefined,
+                                            backgroundImage: `url("${item.background_cover}")`,
                                         }}
                                     />
                                 </div>
@@ -143,20 +169,20 @@ export default function LibraryPage() {
                                 {/* Info */}
                                 <div className="flex-1 min-w-0">
                                     <h4 className="text-sm font-bold text-[#0d141b] dark:text-white truncate">
-                                        {podcast.title}
+                                        {item.title}
                                     </h4>
                                     <div className="flex items-center gap-2 mt-1">
                                         <span className="text-xs text-slate-400 font-medium">
-                                            {podcast.duration}
+                                            {formatDuration(item)}
                                         </span>
                                         <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                        {podcast.status === "in-progress" ? (
+                                        {getStatus(item) === "in-progress" ? (
                                             <span className="text-xs text-[#137fec] font-semibold">
                                                 In Progress
                                             </span>
                                         ) : (
                                             <span className="text-xs text-slate-400 font-medium">
-                                                {podcast.date}
+                                                {formatDate(item.created_at)}
                                             </span>
                                         )}
                                     </div>
@@ -171,12 +197,15 @@ export default function LibraryPage() {
                             </Link>
                         ))}
 
-                        {filteredPodcasts.length === 0 && (
+                        {/* Empty State */}
+                        {!isLoading && !error && library.length === 0 && (
                             <div className="flex flex-col items-center justify-center py-12 text-slate-400">
                                 <span className="material-symbols-outlined text-4xl mb-2">
                                     search_off
                                 </span>
-                                <p className="text-sm font-medium">No podcasts found</p>
+                                <p className="text-sm font-medium">
+                                    {searchQuery ? "No podcasts found" : "Your library is empty"}
+                                </p>
                             </div>
                         )}
                     </div>
