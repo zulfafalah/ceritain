@@ -14,6 +14,7 @@ export type {
     CreateNarrationParams,
     CreateNarrationFromUrlParams,
     TaskStatusResponse,
+    TrendingStory,
 } from "./types";
 
 // API Services

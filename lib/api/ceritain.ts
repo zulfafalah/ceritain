@@ -8,6 +8,7 @@ import type {
     StoryNarrationListParams,
     PaginatedResponse,
     TaskStatusResponse,
+    TrendingStory,
 } from "./types";
 
 /**
@@ -78,6 +79,14 @@ export const storyNarrationApi = {
      */
     delete(id: number): Promise<void> {
         return apiClient.delete<void>(`/story-narration/${id}/`);
+    },
+
+    /**
+     * Get trending story narrations
+     * @returns Array of trending stories
+     */
+    getTrending(): Promise<TrendingStory[]> {
+        return apiClient.get<TrendingStory[]>("/api/v1/ceritain/story-narration/trending");
     },
 };
 

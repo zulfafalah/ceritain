@@ -95,3 +95,22 @@ export interface TaskStatusResponse {
     result?: unknown;
     error?: string;
 }
+
+/**
+ * Trending story item
+ */
+export interface TrendingStory {
+    id: number;
+    status: string;
+    title: string;
+    content_text_preview: string;
+    source_url: string;
+    created_at: string;
+    updated_at: string;
+    total_token: number;
+    result_file: string;
+    created_by: string;
+    play_count: number;
+    estimated_read_time_formatted: string;
+    background_cover: string;
+}

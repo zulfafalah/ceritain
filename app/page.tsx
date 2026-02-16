@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BottomNavigation from "@/components/BottomNavigation";
-import { storyNarrationApi, ApiError } from "@/lib/api";
+import { storyNarrationApi, ApiError, TrendingStory } from "@/lib/api";
 
 export default function Home() {
   const router = useRouter();
@@ -12,6 +12,26 @@ export default function Home() {
   const [urlValue, setUrlValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [trendingTopics, setTrendingTopics] = useState<TrendingStory[]>([]);
+  const [isTrendingLoading, setIsTrendingLoading] = useState(true);
+
+  // Fetch trending topics on component mount
+  useEffect(() => {
+    const fetchTrending = async () => {
+      try {
+        setIsTrendingLoading(true);
+        const data = await storyNarrationApi.getTrending();
+        setTrendingTopics(data.slice(0, 2)); // Only take first 2 items for the grid
+      } catch (err) {
+        console.error("Error fetching trending topics:", err);
+        // Silently fail - don't show error to user for trending topics
+      } finally {
+        setIsTrendingLoading(false);
+      }
+    };
+
+    fetchTrending();
+  }, []);
 
   const handleConvert = async () => {
     // Validate input
@@ -175,46 +195,60 @@ export default function Home() {
               <h3 className="text-[#0d141b] dark:text-white text-base font-semibold mb-4 px-1">
                 Trending Topics
               </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm group-active:scale-95 transition-transform cursor-pointer">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <div
-                      className="w-full h-full bg-center bg-cover"
-                      style={{
-                        backgroundImage: `url("https://lh3.googleusercontent.com/aida-public/AB6AXuASXQ0A_d2mJX-AV5VGiaAauguL9perBvjqHZe33Th2h-XxhgSoTpnt50z1E82r2kRopnk_wWcqJ9J_ZsZX_iTijmsKA6ZvX08o3nNFJzmh2tdFhmU8D-KORe7vpEN2k344tcY9VKWaclmHrrbJy-9gvPL1hfzg6wluFOMUTZc_z9De7IX0N0JAxbncToUcJwclMUdmMc-NCNjCxl_lSrHeymeZmA0NxhFptcZkVytoqwH_-wYpSDwkL20d7wHF_hTjbLedh6GVbQ")`,
-                      }}
-                    />
-                    <div className="absolute bottom-3 left-3 right-3 text-white">
-                      <p className="text-sm font-bold leading-tight truncate">
-                        Tech Trends 2024
-                      </p>
-                      <p className="text-[10px] opacity-80 uppercase tracking-wider">
-                        4 min read
+              {isTrendingLoading ? (
+                <div className="grid grid-cols-2 gap-4">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="flex flex-col gap-3">
+                      <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm bg-white/60 dark:bg-slate-800/60 animate-pulse">
+                        <div className="absolute bottom-3 left-3 right-3">
+                          <div className="h-4 bg-slate-300 dark:bg-slate-600 rounded mb-2"></div>
+                          <div className="h-3 bg-slate-300 dark:bg-slate-600 rounded w-20"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-4">
+                  {trendingTopics.length > 0 ? (
+                    trendingTopics.map((topic) => (
+                      <div
+                        key={topic.id}
+                        className="flex flex-col gap-3 group"
+                        onClick={() => {
+                          if (mode === "url") {
+                            setUrlValue(topic.source_url);
+                          }
+                        }}
+                      >
+                        <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm group-active:scale-95 transition-transform cursor-pointer">
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                          <div
+                            className="w-full h-full bg-center bg-cover"
+                            style={{
+                              backgroundImage: `url("${topic.background_cover}")`,
+                            }}
+                          />
+                          <div className="absolute bottom-3 left-3 right-3 text-white">
+                            <p className="text-sm font-bold leading-tight line-clamp-2">
+                              {topic.title}
+                            </p>
+                            <p className="text-[10px] opacity-80 uppercase tracking-wider mt-1">
+                              {topic.estimated_read_time_formatted}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-span-2 text-center py-8">
+                      <p className="text-slate-400 text-sm">
+                        No trending topics available
                       </p>
                     </div>
-                  </div>
+                  )}
                 </div>
-                <div className="flex flex-col gap-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm group-active:scale-95 transition-transform cursor-pointer">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <div
-                      className="w-full h-full bg-center bg-cover"
-                      style={{
-                        backgroundImage: `url("https://lh3.googleusercontent.com/aida-public/AB6AXuBhffgmtTFcSyxqOWxS9NpVZIx2fW5m1ee2HxMITp2OUKF-vIpghLC1csAbxdSonw-nQ8PYNHpt-4rFQbyg4GUihTk4rnt-A8QSWfNLhjZ_aUNG63WWeA8qf6JtKq-ynU0uf7u9eSmGeqghgjlMS1Pvb55isr-VipwKoPCIPa-06IPUQAoFS1QKl9m8FjyljvqsTirQNjGIW5B21iDIipbKIUb4OucX4T8xPnqqNbQd-bNa0V0rBBycrJWdezROrwKvUDgmIXzl3g")`,
-                      }}
-                    />
-                    <div className="absolute bottom-3 left-3 right-3 text-white">
-                      <p className="text-sm font-bold leading-tight truncate">
-                        Wellness Hacks
-                      </p>
-                      <p className="text-[10px] opacity-80 uppercase tracking-wider">
-                        8 min read
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </main>
