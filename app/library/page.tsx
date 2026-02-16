@@ -199,13 +199,51 @@ export default function LibraryPage() {
 
                         {/* Empty State */}
                         {!isLoading && !error && library.length === 0 && (
-                            <div className="flex flex-col items-center justify-center py-12 text-slate-400">
-                                <span className="material-symbols-outlined text-4xl mb-2">
-                                    search_off
-                                </span>
-                                <p className="text-sm font-medium">
+                            <div className="flex flex-col items-center justify-center py-16 px-6">
+                                {/* Gradient Background Circle */}
+                                <div className="relative mb-6">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-[#137fec]/20 to-purple-500/20 rounded-full blur-2xl"></div>
+                                    <div className="relative bg-gradient-to-br from-[#137fec]/10 to-purple-500/10 backdrop-blur-sm p-8 rounded-full border border-white/20 dark:border-slate-700/30">
+                                        <span className="material-symbols-outlined text-6xl bg-gradient-to-br from-[#137fec] to-purple-500 bg-clip-text text-transparent">
+                                            {searchQuery ? "search_off" : "library_music"}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Text Content */}
+                                <h3 className="text-[#0d141b] dark:text-white text-xl font-bold mb-2 text-center">
                                     {searchQuery ? "No podcasts found" : "Your library is empty"}
+                                </h3>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm text-center mb-6 max-w-xs leading-relaxed">
+                                    {searchQuery
+                                        ? "Try adjusting your search terms or browse your entire library"
+                                        : "Start creating amazing podcasts from your favorite articles and build your audio collection"}
                                 </p>
+
+                                {/* Action Button */}
+                                {!searchQuery && (
+                                    <Link
+                                        href="/"
+                                        className="group flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#137fec] to-purple-500 text-white rounded-full font-semibold shadow-lg shadow-[#137fec]/30 hover:shadow-xl hover:shadow-[#137fec]/40 active:scale-95 transition-all"
+                                    >
+                                        <span className="material-symbols-outlined text-xl">
+                                            add_circle
+                                        </span>
+                                        Create Podcast
+                                    </Link>
+                                )}
+
+                                {searchQuery && (
+                                    <button
+                                        onClick={() => setSearchQuery("")}
+                                        className="flex items-center gap-2 px-6 py-3 bg-white/70 dark:bg-slate-800/70 backdrop-blur-md text-[#137fec] border border-[#137fec]/20 rounded-full font-semibold hover:bg-[#137fec]/10 active:scale-95 transition-all"
+                                    >
+                                        <span className="material-symbols-outlined text-xl">
+                                            clear
+                                        </span>
+                                        Clear Search
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
