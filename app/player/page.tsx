@@ -16,7 +16,7 @@ function PlayerContent() {
     const [error, setError] = useState<string | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
-    const [playbackSpeed, setPlaybackSpeed] = useState(1.5);
+    const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const [waveformHeights, setWaveformHeights] = useState<number[]>([]);
     const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
     const [showToast, setShowToast] = useState(false);
