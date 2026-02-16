@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { PlayerProvider } from "./context/PlayerContext";
+import MiniPlayer from "./components/MiniPlayer";
 
 export const metadata: Metadata = {
   title: "Ceritain - Turn Text into Podcast",
@@ -29,7 +31,10 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        {children}
+        <PlayerProvider>
+          {children}
+          <MiniPlayer />
+        </PlayerProvider>
       </body>
     </html>
   );

@@ -4,94 +4,58 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { storyNarrationApi } from "@/lib/api/ceritain";
-import type { StoryNarrationStatusResponse } from "@/lib/api/types";
+// import type { StoryNarrationStatusResponse } from "@/lib/api/types"; // Not needed if unused directly or handled by context types
+import { usePlayer } from "@/app/context/PlayerContext";
 
 function PlayerContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const podcastId = searchParams.get("id");
 
-    const [narrationData, setNarrationData] = useState<StoryNarrationStatusResponse | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
+    const {
+        playPodcast,
+        togglePlayback,
+        setPlaybackSpeed,
+        audioElement,
+        isPlaying,
+        playbackSpeed,
+        narrationData,
+        currentPodcastId,
+        isLoading,
+        error
+    } = usePlayer();
+
     const [progress, setProgress] = useState(0);
-    const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const [waveformHeights, setWaveformHeights] = useState<number[]>([]);
-    const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
+    const [isLiked, setIsLiked] = useState(false);
 
-    // Fetch narration data
+    // Initial play or sync
     useEffect(() => {
-        const fetchNarrationData = async () => {
-            if (!podcastId) {
-                setError("No narration ID provided");
-                setIsLoading(false);
-                return;
-            }
-
-            try {
-                setIsLoading(true);
-                const data = await storyNarrationApi.getStatus(parseInt(podcastId));
-                setNarrationData(data);
-                setError(null);
-            } catch (err) {
-                console.error("Failed to fetch narration:", err);
-                setError("Failed to load narration");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchNarrationData();
+        if (podcastId) {
+            playPodcast(parseInt(podcastId));
+        }
     }, [podcastId]);
 
-    // Initialize audio element
-    useEffect(() => {
-        if (!narrationData || !podcastId) return;
-
-        // Use streaming endpoint instead of result_file
-        const streamingUrl = storyNarrationApi.getStreamingUrl(parseInt(podcastId));
-        const audio = new Audio(streamingUrl);
-        audio.playbackRate = playbackSpeed;
-
-        // Update progress as audio plays
-        const updateProgress = () => {
-            if (audio.duration) {
-                setProgress((audio.currentTime / audio.duration) * 100);
-            }
-        };
-
-        audio.addEventListener("timeupdate", updateProgress);
-        audio.addEventListener("ended", () => setIsPlaying(false));
-
-        setAudioElement(audio);
-
-        return () => {
-            audio.pause();
-            audio.removeEventListener("timeupdate", updateProgress);
-            audio.removeEventListener("ended", () => setIsPlaying(false));
-        };
-    }, [narrationData, podcastId, playbackSpeed]);
-
-    // Handle play/pause
+    // Update progress
     useEffect(() => {
         if (!audioElement) return;
 
-        if (isPlaying) {
-            audioElement.play().catch(console.error);
-        } else {
-            audioElement.pause();
-        }
-    }, [isPlaying, audioElement]);
+        const updateProgress = () => {
+            if (audioElement.duration) {
+                setProgress((audioElement.currentTime / audioElement.duration) * 100);
+            }
+        };
 
-    // Update playback speed
-    useEffect(() => {
-        if (audioElement) {
-            audioElement.playbackRate = playbackSpeed;
-        }
-    }, [playbackSpeed, audioElement]);
+        audioElement.addEventListener("timeupdate", updateProgress);
+        // We don't need to listen to 'ended' here for playing state as context handles it,
+        // but we might want to update progress to 0 or 100? context handles 'ended' -> isPlaying=false.
+
+        return () => {
+            audioElement.removeEventListener("timeupdate", updateProgress);
+        };
+    }, [audioElement]);
 
     // Generate random waveform heights
     useEffect(() => {
@@ -111,10 +75,6 @@ function PlayerContent() {
 
         return () => clearInterval(interval);
     }, [isPlaying]);
-
-    const togglePlayback = () => {
-        setIsPlaying(!isPlaying);
-    };
 
     const cycleSpeed = () => {
         const speeds = [1, 1.25, 1.5, 1.75, 2];
@@ -143,6 +103,10 @@ function PlayerContent() {
         }, 3000);
     };
 
+    const toggleLike = () => {
+        setIsLiked(!isLiked);
+    };
+
     const handleShare = async () => {
         if (!narrationData) return;
 
@@ -154,20 +118,15 @@ function PlayerContent() {
         };
 
         try {
-            // Check if Web Share API is available
             if (navigator.share) {
                 await navigator.share(shareData);
             } else {
-                // Fallback: Copy to clipboard
                 await navigator.clipboard.writeText(shareUrl);
-                // Show toast notification
                 showToastNotification("Link copied to clipboard!");
             }
         } catch (error) {
-            // User cancelled share or error occurred
             if (error instanceof Error && error.name !== "AbortError") {
                 console.error("Error sharing:", error);
-                // Fallback to clipboard
                 try {
                     await navigator.clipboard.writeText(shareUrl);
                     showToastNotification("Link copied to clipboard!");
@@ -177,6 +136,10 @@ function PlayerContent() {
                 }
             }
         }
+    };
+
+    const handleMinimize = () => {
+        router.push('/');
     };
 
     // Show loading state
@@ -190,6 +153,7 @@ function PlayerContent() {
 
     // Show error state or no ID state
     if (error || !narrationData || !podcastId) {
+        // Re-using existing error UI logic...
         const isNoId = !podcastId;
         const errorMessage = isNoId
             ? "No podcast selected"
@@ -404,11 +368,17 @@ function PlayerContent() {
                             <span className="text-sm font-bold text-[#0d141b] dark:text-white">{playbackSpeed}x</span>
                         </button>
                         <div className="flex gap-4">
-                            <button className="flex items-center justify-center size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 text-[#0d141b] dark:text-white hover:scale-105 active:scale-95 transition-transform">
-                                <span className="material-symbols-outlined text-xl">playlist_add</span>
+                            <button
+                                className={`flex items-center justify-center size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm border ${isLiked ? 'border-red-100 dark:border-red-900/30 text-red-500' : 'border-slate-100 dark:border-slate-700 text-[#0d141b] dark:text-white'} hover:scale-105 active:scale-95 transition-transform`}
+                                onClick={toggleLike}
+                            >
+                                <span className={`material-symbols-outlined text-xl ${isLiked ? 'filled' : ''}`}>favorite</span>
                             </button>
-                            <button className="flex items-center justify-center size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 text-[#0d141b] dark:text-white hover:scale-105 active:scale-95 transition-transform">
-                                <span className="material-symbols-outlined text-xl">subtitles</span>
+                            <button
+                                className="flex items-center justify-center size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 text-[#0d141b] dark:text-white hover:scale-105 active:scale-95 transition-transform"
+                                onClick={handleMinimize}
+                            >
+                                <span className="material-symbols-outlined text-xl">remove</span>
                             </button>
                         </div>
                     </div>
