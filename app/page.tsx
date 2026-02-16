@@ -216,9 +216,7 @@ export default function Home() {
                         key={topic.id}
                         className="flex flex-col gap-3 group"
                         onClick={() => {
-                          if (mode === "url") {
-                            setUrlValue(topic.source_url);
-                          }
+                          router.push(`/player?id=${topic.id}`);
                         }}
                       >
                         <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm group-active:scale-95 transition-transform cursor-pointer">
