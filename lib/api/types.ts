@@ -142,3 +142,27 @@ export interface LibraryListParams {
     search?: string;
     created_by?: string;
 }
+
+/**
+ * Story narration status response
+ * Response from /story-narration/{id}/status endpoint
+ */
+export interface StoryNarrationStatusResponse {
+    id: number;
+    status: string;
+    title: string;
+    content_text: string;
+    source_url: string;
+    final_content: string;
+    created_at: string;
+    updated_at: string;
+    input_token: number;
+    output_token: number;
+    total_token: number;
+    result_file: string;
+    message_response: string | null;
+    estimated_read_time: number;
+    estimated_read_time_formatted: string;
+    play_count: number;
+    background_cover: string;
+}

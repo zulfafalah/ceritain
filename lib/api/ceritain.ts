@@ -11,6 +11,7 @@ import type {
     TrendingStory,
     LibraryStoryNarration,
     LibraryListParams,
+    StoryNarrationStatusResponse,
 } from "./types";
 
 /**
@@ -60,6 +61,15 @@ export const storyNarrationApi = {
     },
 
     /**
+     * Get story narration status with full details
+     * @param id - The story narration ID
+     * @returns Full status response including audio file and metadata
+     */
+    getStatus(id: number): Promise<StoryNarrationStatusResponse> {
+        return apiClient.get<StoryNarrationStatusResponse>(`/api/v1/ceritain/story-narration/${id}/status`);
+    },
+
+    /**
      * Get task status for a story narration
      * @param taskId - The celery task ID
      */
@@ -98,6 +108,15 @@ export const storyNarrationApi = {
      */
     getLibrary(params?: LibraryListParams): Promise<LibraryStoryNarration[]> {
         return apiClient.get<LibraryStoryNarration[]>("/api/v1/ceritain/story-narration/", { params });
+    },
+
+    /**
+     * Get streaming URL for audio playback
+     * @param id - The story narration ID
+     * @returns Full URL to streaming endpoint
+     */
+    getStreamingUrl(id: number): string {
+        return `${apiClient.baseUrl}/api/v1/ceritain/story-narration/${id}/streaming`;
     },
 };
 

@@ -3,51 +3,93 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-
-// Podcast data - in a real app, this would come from an API
-const podcastData: Record<string, {
-    title: string;
-    source: string;
-    image: string;
-    duration: string;
-}> = {
-    "1": {
-        title: "The Future of AI",
-        source: "Tech Trends Article",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuASXQ0A_d2mJX-AV5VGiaAauguL9perBvjqHZe33Th2h-XxhgSoTpnt50z1E82r2kRopnk_wWcqJ9J_ZsZX_iTijmsKA6ZvX08o3nNFJzmh2tdFhmU8D-KORe7vpEN2k344tcY9VKWaclmHrrbJy-9gvPL1hfzg6wluFOMUTZc_z9De7IX0N0JAxbncToUcJwclMUdmMc-NCNjCxl_lSrHeymeZmA0NxhFptcZkVytoqwH_-wYpSDwkL20d7wHF_hTjbLedh6GVbQ",
-        duration: "12:05",
-    },
-    "2": {
-        title: "Mindfulness Hacks for Gen Z",
-        source: "Wellness Blog",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBhffgmtTFcSyxqOWxS9NpVZIx2fW5m1ee2HxMITp2OUKF-vIpghLC1csAbxdSonw-nQ8PYNHpt-4rFQbyg4GUihTk4rnt-A8QSWfNLhjZ_aUNG63WWeA8qf6JtKq-ynU0uf7u9eSmGeqghgjlMS1Pvb55isr-VipwKoPCIPa-06IPUQAoFS1QKl9m8FjyljvqsTirQNjGIW5B21iDIipbKIUb4OucX4T8xPnqqNbQd-bNa0V0rBBycrJWdezROrwKvUDgmIXzl3g",
-        duration: "08:42",
-    },
-    "3": {
-        title: "Sustainable Fashion FAQ",
-        source: "Fashion Magazine",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuASXQ0A_d2mJX-AV5VGiaAauguL9perBvjqHZe33Th2h-XxhgSoTpnt50z1E82r2kRopnk_wWcqJ9J_ZsZX_iTijmsKA6ZvX08o3nNFJzmh2tdFhmU8D-KORe7vpEN2k344tcY9VKWaclmHrrbJy-9gvPL1hfzg6wluFOMUTZc_z9De7IX0N0JAxbncToUcJwclMUdmMc-NCNjCxl_lSrHeymeZmA0NxhFptcZkVytoqwH_-wYpSDwkL20d7wHF_hTjbLedh6GVbQ",
-        duration: "15:20",
-    },
-    "4": {
-        title: "The Rise of Remote Work",
-        source: "Business Weekly",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBhffgmtTFcSyxqOWxS9NpVZIx2fW5m1ee2HxMITp2OUKF-vIpghLC1csAbxdSonw-nQ8PYNHpt-4rFQbyg4GUihTk4rnt-A8QSWfNLhjZ_aUNG63WWeA8qf6JtKq-ynU0uf7u9eSmGeqghgjlMS1Pvb55isr-VipwKoPCIPa-06IPUQAoFS1QKl9m8FjyljvqsTirQNjGIW5B21iDIipbKIUb4OucX4T8xPnqqNbQd-bNa0V0rBBycrJWdezROrwKvUDgmIXzl3g",
-        duration: "21:30",
-    },
-};
+import { storyNarrationApi } from "@/lib/api/ceritain";
+import type { StoryNarrationStatusResponse } from "@/lib/api/types";
 
 function PlayerContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const podcastId = searchParams.get("id") || "1";
+    const podcastId = searchParams.get("id");
 
-    const [isPlaying, setIsPlaying] = useState(true);
-    const [progress, setProgress] = useState(35);
+    const [narrationData, setNarrationData] = useState<StoryNarrationStatusResponse | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [progress, setProgress] = useState(0);
     const [playbackSpeed, setPlaybackSpeed] = useState(1.5);
     const [waveformHeights, setWaveformHeights] = useState<number[]>([]);
+    const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
 
-    const podcast = podcastData[podcastId] || podcastData["1"];
+    // Fetch narration data
+    useEffect(() => {
+        const fetchNarrationData = async () => {
+            if (!podcastId) {
+                setError("No narration ID provided");
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                setIsLoading(true);
+                const data = await storyNarrationApi.getStatus(parseInt(podcastId));
+                setNarrationData(data);
+                setError(null);
+            } catch (err) {
+                console.error("Failed to fetch narration:", err);
+                setError("Failed to load narration");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchNarrationData();
+    }, [podcastId]);
+
+    // Initialize audio element
+    useEffect(() => {
+        if (!narrationData || !podcastId) return;
+
+        // Use streaming endpoint instead of result_file
+        const streamingUrl = storyNarrationApi.getStreamingUrl(parseInt(podcastId));
+        const audio = new Audio(streamingUrl);
+        audio.playbackRate = playbackSpeed;
+
+        // Update progress as audio plays
+        const updateProgress = () => {
+            if (audio.duration) {
+                setProgress((audio.currentTime / audio.duration) * 100);
+            }
+        };
+
+        audio.addEventListener("timeupdate", updateProgress);
+        audio.addEventListener("ended", () => setIsPlaying(false));
+
+        setAudioElement(audio);
+
+        return () => {
+            audio.pause();
+            audio.removeEventListener("timeupdate", updateProgress);
+            audio.removeEventListener("ended", () => setIsPlaying(false));
+        };
+    }, [narrationData, podcastId, playbackSpeed]);
+
+    // Handle play/pause
+    useEffect(() => {
+        if (!audioElement) return;
+
+        if (isPlaying) {
+            audioElement.play().catch(console.error);
+        } else {
+            audioElement.pause();
+        }
+    }, [isPlaying, audioElement]);
+
+    // Update playback speed
+    useEffect(() => {
+        if (audioElement) {
+            audioElement.playbackRate = playbackSpeed;
+        }
+    }, [playbackSpeed, audioElement]);
 
     // Generate random waveform heights
     useEffect(() => {
@@ -79,12 +121,126 @@ function PlayerContent() {
         setPlaybackSpeed(speeds[nextIndex]);
     };
 
-    // Calculate current time based on progress
-    const totalSeconds = parseInt(podcast.duration.split(":")[0]) * 60 + parseInt(podcast.duration.split(":")[1]);
-    const currentSeconds = Math.floor((progress / 100) * totalSeconds);
-    const currentTime = `${Math.floor(currentSeconds / 60).toString().padStart(2, "0")}:${(currentSeconds % 60).toString().padStart(2, "0")}`;
-    const remainingSeconds = totalSeconds - currentSeconds;
-    const remainingTime = `${Math.floor(remainingSeconds / 60).toString().padStart(2, "0")}:${(remainingSeconds % 60).toString().padStart(2, "0")}`;
+    const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!audioElement) return;
+
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const newProgress = (x / rect.width) * 100;
+        const newTime = (newProgress / 100) * audioElement.duration;
+
+        audioElement.currentTime = newTime;
+        setProgress(newProgress);
+    };
+
+    const handleShare = async () => {
+        if (!narrationData) return;
+
+        const shareUrl = `${window.location.origin}/player?id=${podcastId}`;
+        const shareData = {
+            title: narrationData.title,
+            text: `Listen to "${narrationData.title}" on Ceritain`,
+            url: shareUrl,
+        };
+
+        try {
+            // Check if Web Share API is available
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                // Fallback: Copy to clipboard
+                await navigator.clipboard.writeText(shareUrl);
+                // Show toast notification
+                alert("Link copied to clipboard!");
+            }
+        } catch (error) {
+            // User cancelled share or error occurred
+            if (error instanceof Error && error.name !== "AbortError") {
+                console.error("Error sharing:", error);
+                // Fallback to clipboard
+                try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    alert("Link copied to clipboard!");
+                } catch (clipboardError) {
+                    console.error("Clipboard error:", clipboardError);
+                }
+            }
+        }
+    };
+
+    // Show loading state
+    if (isLoading) {
+        return (
+            <div className="min-h-screen w-full bg-[#f6f7f8] dark:bg-[#101922] flex justify-center items-center">
+                <div className="animate-pulse text-[#0d141b] dark:text-white">Loading narration...</div>
+            </div>
+        );
+    }
+
+    // Show error state or no ID state
+    if (error || !narrationData || !podcastId) {
+        const isNoId = !podcastId;
+        const errorMessage = isNoId
+            ? "No podcast selected"
+            : error || "Narration not found";
+        const errorDescription = isNoId
+            ? "Please select a podcast from your library to start listening"
+            : "We couldn't find the podcast you're looking for. It may have been deleted or the link is invalid.";
+
+        return (
+            <div className="min-h-screen w-full bg-[#f6f7f8] dark:bg-[#101922] flex justify-center">
+                <div className="relative flex min-h-screen w-full max-w-[480px] flex-col items-center justify-center p-8 text-center">
+                    {/* Empty State Icon */}
+                    <div className="mb-8 relative">
+                        <div className="absolute inset-0 bg-[#137fec]/10 blur-3xl rounded-full"></div>
+                        <div className="relative w-32 h-32 rounded-full bg-gradient-to-br from-[#137fec]/20 to-purple-500/20 dark:from-[#137fec]/30 dark:to-purple-500/30 flex items-center justify-center backdrop-blur-sm border border-[#137fec]/20">
+                            <span className="material-symbols-outlined text-[#137fec] dark:text-[#4a9eff]" style={{ fontSize: '64px' }}>
+                                {isNoId ? 'radio' : 'error_outline'}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Error Message */}
+                    <h1 className="text-[#0d141b] dark:text-white text-2xl font-bold mb-3">
+                        {errorMessage}
+                    </h1>
+                    <p className="text-[#0d141b]/60 dark:text-slate-400 text-sm max-w-[320px] mb-8 leading-relaxed">
+                        {errorDescription}
+                    </p>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col gap-3 w-full max-w-[280px]">
+                        <Link
+                            href="/library"
+                            className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#137fec] text-white font-medium shadow-lg shadow-[#137fec]/30 hover:scale-105 active:scale-95 transition-transform"
+                        >
+                            <span className="material-symbols-outlined text-xl">library_music</span>
+                            <span>Go to Library</span>
+                        </Link>
+                        <Link
+                            href="/"
+                            className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white dark:bg-slate-800 text-[#0d141b] dark:text-white font-medium shadow-sm border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95 transition-transform"
+                        >
+                            <span className="material-symbols-outlined text-xl">home</span>
+                            <span>Back to Home</span>
+                        </Link>
+                    </div>
+
+                    {/* iOS Indicator */}
+                    <div className="absolute bottom-4 flex justify-center">
+                        <div className="w-32 h-1.5 bg-black/10 dark:bg-white/10 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Calculate current time and remaining time
+    const duration = audioElement?.duration || narrationData.estimated_read_time || 0;
+    const currentSeconds = audioElement?.currentTime || 0;
+    const currentTime = `${Math.floor(currentSeconds / 60).toString().padStart(2, "0")}:${Math.floor(currentSeconds % 60).toString().padStart(2, "0")}`;
+    const remainingSeconds = duration - currentSeconds;
+    const remainingTime = `${Math.floor(remainingSeconds / 60).toString().padStart(2, "0")}:${Math.floor(remainingSeconds % 60).toString().padStart(2, "0")}`;
 
     return (
         <div className="min-h-screen w-full bg-[#f6f7f8] dark:bg-[#101922] flex justify-center">
@@ -98,7 +254,10 @@ function PlayerContent() {
                         <span className="material-symbols-outlined text-[#0d141b] dark:text-white">expand_more</span>
                     </Link>
                     <h2 className="text-sm font-bold uppercase tracking-widest text-[#0d141b]/60 dark:text-white/60">Now Playing</h2>
-                    <button className="flex size-12 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm cursor-pointer hover:scale-105 transition-transform">
+                    <button
+                        className="flex size-12 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm cursor-pointer hover:scale-105 transition-transform"
+                        onClick={handleShare}
+                    >
                         <span className="material-symbols-outlined text-[#0d141b] dark:text-white">share</span>
                     </button>
                 </div>
@@ -111,7 +270,7 @@ function PlayerContent() {
                             <div
                                 className="w-full h-full bg-center bg-no-repeat bg-cover opacity-90 mix-blend-overlay"
                                 style={{
-                                    backgroundImage: `url("${podcast.image}")`,
+                                    backgroundImage: `url("${narrationData.background_cover}")`,
                                 }}
                             />
                             <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6">
@@ -127,8 +286,10 @@ function PlayerContent() {
 
                 {/* Title & Metadata */}
                 <div className="px-8 text-center mb-8">
-                    <h1 className="text-[#0d141b] dark:text-white text-3xl font-bold tracking-tight mb-2">{podcast.title}</h1>
-                    <p className="text-[#0d141b]/60 dark:text-slate-400 text-sm font-medium">Source: {podcast.source}</p>
+                    <h1 className="text-[#0d141b] dark:text-white text-3xl font-bold tracking-tight mb-2">{narrationData.title}</h1>
+                    <p className="text-[#0d141b]/60 dark:text-slate-400 text-sm font-medium">
+                        {narrationData.source_url ? `Source: ${new URL(narrationData.source_url).hostname}` : `${narrationData.estimated_read_time_formatted} read`}
+                    </p>
                 </div>
 
                 {/* Waveform Visualizer */}
@@ -152,12 +313,7 @@ function PlayerContent() {
                     <div className="flex flex-col gap-2">
                         <div
                             className="h-1.5 w-full rounded-full bg-[#cfdbe7] dark:bg-slate-700 relative overflow-hidden cursor-pointer"
-                            onClick={(e) => {
-                                const rect = e.currentTarget.getBoundingClientRect();
-                                const x = e.clientX - rect.left;
-                                const newProgress = (x / rect.width) * 100;
-                                setProgress(Math.max(0, Math.min(100, newProgress)));
-                            }}
+                            onClick={handleProgressClick}
                         >
                             <div
                                 className="absolute left-0 top-0 h-full bg-[#137fec] rounded-full transition-all duration-150"
@@ -176,7 +332,11 @@ function PlayerContent() {
                     <div className="flex items-center justify-between max-w-[280px] mx-auto mb-10">
                         <button
                             className="flex items-center justify-center size-12 text-[#0d141b] dark:text-white opacity-80 hover:opacity-100 transition-opacity active:scale-95"
-                            onClick={() => setProgress(Math.max(0, progress - 10))}
+                            onClick={() => {
+                                if (audioElement) {
+                                    audioElement.currentTime = Math.max(0, audioElement.currentTime - 10);
+                                }
+                            }}
                         >
                             <span className="material-symbols-outlined text-3xl">replay_10</span>
                         </button>
@@ -190,7 +350,11 @@ function PlayerContent() {
                         </button>
                         <button
                             className="flex items-center justify-center size-12 text-[#0d141b] dark:text-white opacity-80 hover:opacity-100 transition-opacity active:scale-95"
-                            onClick={() => setProgress(Math.min(100, progress + 10))}
+                            onClick={() => {
+                                if (audioElement) {
+                                    audioElement.currentTime = Math.min(audioElement.duration, audioElement.currentTime + 10);
+                                }
+                            }}
                         >
                             <span className="material-symbols-outlined text-3xl">forward_10</span>
                         </button>
