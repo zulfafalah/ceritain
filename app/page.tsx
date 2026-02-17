@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BottomNavigation from "@/components/BottomNavigation";
 import { storyNarrationApi, ApiError, TrendingStory } from "@/lib/api";
+import { usePlayer } from "./context/PlayerContext";
 
 export default function Home() {
   const router = useRouter();
@@ -14,6 +15,8 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [trendingTopics, setTrendingTopics] = useState<TrendingStory[]>([]);
   const [isTrendingLoading, setIsTrendingLoading] = useState(true);
+  const { currentPodcastId, narrationData } = usePlayer();
+  const isPlayerVisible = !!currentPodcastId && !!narrationData;
 
   // Fetch trending topics on component mount
   useEffect(() => {
@@ -255,7 +258,7 @@ export default function Home() {
         <div className="fixed bottom-0 left-0 right-0 z-30 flex justify-center">
           <div className="w-full max-w-[480px]">
             {/* Convert Button */}
-            <div className="px-6 pb-6 pt-2 bg-gradient-to-t from-white/80 dark:from-slate-900/80 to-transparent">
+            <div className={`px-6 pb-6 pt-2 bg-gradient-to-t from-white/80 dark:from-slate-900/80 to-transparent transition-all duration-300 ${isPlayerVisible ? 'mb-[80px]' : ''}`}>
               {/* Error Message */}
               {error && (
                 <div className="mb-3 px-4 py-3 rounded-xl bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm font-medium text-center">
