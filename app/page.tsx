@@ -187,7 +187,7 @@ export default function Home() {
                 <div className="flex w-full flex-1 items-stretch rounded-xl shadow-sm overflow-hidden">
                   <input
                     className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-l-xl text-[#0d141b] dark:text-white focus:outline-0 focus:ring-2 focus:ring-[#137fec]/20 border border-white dark:border-slate-700 border-r-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm h-14 placeholder:text-slate-400 p-5 text-base font-normal transition-all"
-                    placeholder="https://example.com/article"
+                    placeholder="https://medium.com/..."
                     value={urlValue}
                     onChange={(e) => setUrlValue(e.target.value)}
                   />
@@ -195,6 +195,9 @@ export default function Home() {
                     <span className="material-symbols-outlined text-2xl">link</span>
                   </div>
                 </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 px-1">
+                  * Only medium.com articles are currently supported
+                </p>
               </div>
             )}
 
