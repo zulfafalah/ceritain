@@ -224,7 +224,7 @@ export default function LibraryPage() {
                                 {!searchQuery && (
                                     <Link
                                         href="/"
-                                        className="group flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#137fec] to-purple-500 text-white rounded-full font-semibold shadow-lg shadow-[#137fec]/30 hover:shadow-xl hover:shadow-[#137fec]/40 active:scale-95 transition-all"
+                                        className="group flex items-center gap-2 px-6 py-3 bg-[#137fec] hover:bg-[#137fec]/90 text-white rounded-full font-semibold shadow-lg shadow-[#137fec]/30 hover:shadow-xl hover:shadow-[#137fec]/40 active:scale-95 transition-all"
                                     >
                                         <span className="material-symbols-outlined text-xl">
                                             add_circle
