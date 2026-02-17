@@ -37,18 +37,40 @@ async function handleResponse<T>(response: Response): Promise<T> {
                 errorMessage = errorData.detail;
             }
             // Check for validation errors in format: { "error": { "field_name": ["error message"] } }
-            else if (errorData.error && typeof errorData.error === 'object') {
-                const errors: string[] = [];
-                for (const field in errorData.error) {
-                    const fieldErrors = errorData.error[field];
-                    if (Array.isArray(fieldErrors)) {
-                        errors.push(...fieldErrors);
-                    } else if (typeof fieldErrors === 'string') {
-                        errors.push(fieldErrors);
+            else if (errorData.error) {
+                if (typeof errorData.error === 'object') {
+                    const errors: string[] = [];
+                    for (const field in errorData.error) {
+                        const fieldErrors = (errorData.error as Record<string, string | string[]>)[field];
+                        if (Array.isArray(fieldErrors)) {
+                            errors.push(...fieldErrors);
+                        } else if (typeof fieldErrors === 'string') {
+                            errors.push(fieldErrors);
+                        }
                     }
-                }
-                if (errors.length > 0) {
-                    errorMessage = errors.join(', ');
+                    if (errors.length > 0) {
+                        errorMessage = errors.join(', ');
+                    }
+                } else if (typeof errorData.error === 'string') {
+                    // Handle string error messages, including potential Python dict string representation
+                    // Example: "Unexpected error: {'__all__': ['The server is taking a coffee break...']}"
+                    let errorStr = errorData.error;
+
+                    if (errorStr.includes("Unexpected error:")) {
+                        errorStr = errorStr.replace("Unexpected error:", "").trim();
+                    }
+
+                    // Try to parse Python-like dict string if it contains __all__
+                    if (errorStr.includes("'__all__':")) {
+                        const match = errorStr.match(/'__all__': \['(.*?)'\]/);
+                        if (match && match[1]) {
+                            errorMessage = match[1];
+                        } else {
+                            errorMessage = errorStr;
+                        }
+                    } else {
+                        errorMessage = errorStr;
+                    }
                 }
             }
         }
