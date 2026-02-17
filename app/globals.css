@@ -83,12 +83,31 @@ body {
     transform: translate(-50%, -100%);
     opacity: 0;
   }
+
   to {
     transform: translate(-50%, 0);
     opacity: 1;
   }
 }
 
+
 .animate-slideDown {
   animation: slideDown 0.3s ease-out forwards;
+}
+
+/* Modal Animation */
+@keyframes modalScale {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-modalScale {
+  animation: modalScale 0.2s ease-out forwards;
 }

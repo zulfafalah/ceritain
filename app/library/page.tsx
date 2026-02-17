@@ -5,6 +5,7 @@ import Link from "next/link";
 import BottomNavigation from "@/components/BottomNavigation";
 import { storyNarrationApi, LibraryStoryNarration } from "@/lib/api";
 import { useFingerprint } from "@/lib/useFingerprint";
+import Modal from "@/app/components/Modal";
 
 export default function LibraryPage() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -13,6 +14,7 @@ export default function LibraryPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { fingerprint, isLoading: fingerprintLoading } = useFingerprint();
+    const [showProcessingModal, setShowProcessingModal] = useState(false);
 
     // Debounce search query
     useEffect(() => {
@@ -154,6 +156,12 @@ export default function LibraryPage() {
                             <Link
                                 key={item.id}
                                 href={`/player?id=${item.id}`}
+                                onClick={(e) => {
+                                    if (item.status !== "done") {
+                                        e.preventDefault();
+                                        setShowProcessingModal(true);
+                                    }
+                                }}
                                 className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 rounded-2xl border border-white/50 dark:border-slate-700/50 flex items-center gap-4 shadow-sm group active:scale-[0.98] transition-all cursor-pointer"
                             >
                                 {/* Thumbnail */}
@@ -256,6 +264,29 @@ export default function LibraryPage() {
                     </div>
                 </div>
             </div>
+            {/* Processing Modal */}
+            <Modal
+                isOpen={showProcessingModal}
+                onClose={() => setShowProcessingModal(false)}
+                title="Podcast is Brewing!"
+            >
+                <div className="flex flex-col items-center text-center">
+                    <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
+                        <span className="material-symbols-outlined text-3xl text-blue-600 dark:text-blue-400 animate-pulse">
+                            hourglass_top
+                        </span>
+                    </div>
+                    <p className="text-slate-600 dark:text-slate-300 mb-6">
+                        Your podcast is currently being processed by our AI chefs. Please wait a moment while we finish cooking up your audio!
+                    </p>
+                    <button
+                        onClick={() => setShowProcessingModal(false)}
+                        className="w-full py-3 px-4 bg-[#137fec] hover:bg-[#137fec]/90 text-white rounded-xl font-medium transition-colors"
+                    >
+                        Got it, I&apos;ll wait
+                    </button>
+                </div>
+            </Modal>
         </div>
     );
 }
