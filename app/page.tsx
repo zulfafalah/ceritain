@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import BottomNavigation from "@/components/BottomNavigation";
 import { storyNarrationApi, ApiError, TrendingStory } from "@/lib/api";
@@ -17,6 +17,7 @@ export default function Home() {
   const [isTrendingLoading, setIsTrendingLoading] = useState(true);
   const { currentPodcastId, narrationData } = usePlayer();
   const isPlayerVisible = !!currentPodcastId && !!narrationData;
+  const isSubmittingRef = useRef(false);
 
   // Fetch trending topics on component mount
   useEffect(() => {
@@ -37,6 +38,8 @@ export default function Home() {
   }, []);
 
   const handleConvert = async () => {
+    if (isSubmittingRef.current) return;
+
     // Validate input
     if (mode === "text" && !textContent.trim()) {
       setError("Please enter some text content");
@@ -47,6 +50,7 @@ export default function Home() {
       return;
     }
 
+    isSubmittingRef.current = true;
     setIsLoading(true);
     setError(null);
 
@@ -78,6 +82,7 @@ export default function Home() {
       }
       console.error("Error creating narration:", err);
     } finally {
+      isSubmittingRef.current = false;
       setIsLoading(false);
     }
   };
