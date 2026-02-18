@@ -54,6 +54,37 @@ export default function LibraryPage() {
         fetchLibrary();
     }, [fingerprint, fingerprintLoading, debouncedSearchQuery]);
 
+    // Poll library data for status updates
+    useEffect(() => {
+        if (!fingerprint || fingerprintLoading) return;
+
+        const pollLibrary = async () => {
+            try {
+                const data = await storyNarrationApi.getLibrary({
+                    created_by: fingerprint.visitorId,
+                    search: debouncedSearchQuery || undefined,
+                });
+
+                setLibrary(prev => {
+                    // Simple check to avoid unnecessary re-renders if data matches
+                    if (JSON.stringify(prev) === JSON.stringify(data)) {
+                        return prev;
+                    }
+                    return data;
+                });
+            } catch (err) {
+                console.error("Failed to poll library:", err);
+            }
+        };
+
+        // Poll every 5 seconds
+        const intervalId = setInterval(pollLibrary, 5000);
+
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, [fingerprint, fingerprintLoading, debouncedSearchQuery]);
+
     // Format duration from estimated_read_time
     const formatDuration = (item: LibraryStoryNarration) => {
         return item.estimated_read_time_formatted || `${item.estimated_read_time} Sec`;
