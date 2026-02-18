@@ -6,7 +6,7 @@ import type { StoryNarrationStatusResponse } from "@/lib/api/types";
 
 interface PlayerContextType {
     isPlaying: boolean;
-    currentPodcastId: number | null;
+    currentPodcastId: string | null;
     narrationData: StoryNarrationStatusResponse | null;
     playbackSpeed: number;
     audioElement: HTMLAudioElement | null;
@@ -14,7 +14,7 @@ interface PlayerContextType {
     error: string | null;
     togglePlayback: () => void;
     setPlaybackSpeed: (speed: number) => void;
-    playPodcast: (id: number) => Promise<void>;
+    playPodcast: (uuid: string) => Promise<void>;
     seek: (time: number) => void;
     closePlayer: () => void;
 }
@@ -22,7 +22,7 @@ interface PlayerContextType {
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
 
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
-    const [currentPodcastId, setCurrentPodcastId] = useState<number | null>(null);
+    const [currentPodcastId, setCurrentPodcastId] = useState<string | null>(null);
     const [narrationData, setNarrationData] = useState<StoryNarrationStatusResponse | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
@@ -64,9 +64,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         }
     }, [playbackSpeed]);
 
-    const playPodcast = async (id: number) => {
+    const playPodcast = async (uuid: string) => {
         // If playing the same podcast, do nothing (or maybe toggle? lets stick to just ensuring it's loaded)
-        if (currentPodcastId === id && narrationData) {
+        if (currentPodcastId === uuid && narrationData) {
             // Already active, just play if paused
             if (audioRef.current?.paused) {
                 audioRef.current.play().catch(e => console.error("Playback failed", e));
@@ -79,13 +79,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             setError(null);
 
             // 1. Fetch data
-            const data = await storyNarrationApi.getStatus(id);
+            const data = await storyNarrationApi.getStatus(uuid);
             setNarrationData(data);
-            setCurrentPodcastId(id);
+            setCurrentPodcastId(uuid);
 
             // 2. Setup audio source
             if (audioRef.current) {
-                const streamingUrl = storyNarrationApi.getStreamingUrl(id);
+                const streamingUrl = storyNarrationApi.getStreamingUrl(uuid);
                 audioRef.current.src = streamingUrl;
                 audioRef.current.load();
                 audioRef.current.playbackRate = playbackSpeed;

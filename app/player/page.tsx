@@ -34,7 +34,7 @@ function PlayerContent() {
     // Initial play or sync
     useEffect(() => {
         if (podcastId) {
-            playPodcast(parseInt(podcastId));
+            playPodcast(podcastId);
         }
     }, [podcastId]);
 

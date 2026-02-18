@@ -12,7 +12,7 @@ export interface CreateNarrationResponse {
     success: boolean;
     message: string;
     task_id: string;
-    story_narration_id: number;
+    story_narration_id: string;
     status: string;
 }
 
@@ -20,7 +20,7 @@ export interface CreateNarrationResponse {
  * Trending story item
  */
 export interface TrendingStory {
-    id: number;
+    id: string;
     status: string;
     title: string;
     content_text_preview: string;
@@ -39,7 +39,7 @@ export interface TrendingStory {
  * Library story narration item
  */
 export interface LibraryStoryNarration {
-    id: number;
+    id: string;
     status: string;
     title: string;
     content_text_preview: string;
@@ -65,10 +65,10 @@ export interface LibraryListParams {
 
 /**
  * Story narration status response
- * Response from /story-narration/{id}/status endpoint
+ * Response from /story-narration/{uuid}/status endpoint
  */
 export interface StoryNarrationStatusResponse {
-    id: number;
+    id: string;
     status: string;
     title: string;
     content_text: string;

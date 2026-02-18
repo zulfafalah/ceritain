@@ -77,11 +77,11 @@ export const storyNarrationApi = {
 
     /**
      * Get story narration status with full details
-     * @param id - The story narration ID
+     * @param uuid - The story narration UUID
      * @returns Full status response including audio file and metadata
      */
-    getStatus(id: number): Promise<StoryNarrationStatusResponse> {
-        return apiClient.get<StoryNarrationStatusResponse>(`/api/v1/ceritain/story-narration/${id}/status`);
+    getStatus(uuid: string): Promise<StoryNarrationStatusResponse> {
+        return apiClient.get<StoryNarrationStatusResponse>(`/api/v1/ceritain/story-narration/${uuid}/status`);
     },
 
     /**
@@ -103,11 +103,11 @@ export const storyNarrationApi = {
 
     /**
      * Get streaming URL for audio playback
-     * @param id - The story narration ID
+     * @param uuid - The story narration UUID
      * @returns Full URL to streaming endpoint
      */
-    getStreamingUrl(id: number): string {
-        return `${apiClient.baseUrl}/api/v1/ceritain/story-narration/${id}/streaming`;
+    getStreamingUrl(uuid: string): string {
+        return `${apiClient.baseUrl}/api/v1/ceritain/story-narration/${uuid}/streaming`;
     },
 };
 
