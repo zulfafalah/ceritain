@@ -100,6 +100,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
                 console.log("Playback aborted");
                 return;
             }
+
+            // Handle autoplay restrictions (NotAllowedError)
+            if (err.name === 'NotAllowedError') {
+                console.log("Autoplay prevented. User interaction required.");
+                setIsPlaying(false);
+                return;
+            }
+
             console.error("Failed to play podcast:", err);
             setError("Failed to load podcast");
             setIsPlaying(false);

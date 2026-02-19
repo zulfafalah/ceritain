@@ -263,7 +263,7 @@ function PlayerContent() {
                             <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6">
                                 <span className="material-symbols-outlined text-6xl mb-4 opacity-80">graphic_eq</span>
                                 <div className="text-center">
-                                    <div className="text-xs font-bold tracking-[0.2em] uppercase opacity-70 mb-1">AI Generated</div>
+                                    <div className="text-xs font-bold tracking-[0.2em] uppercase opacity-70 mb-1">Digital Voice</div>
                                     <div className="text-3xl font-bold leading-none">THE DEEP DIVE</div>
                                 </div>
                             </div>
