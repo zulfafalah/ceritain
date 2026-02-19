@@ -25,7 +25,7 @@ export default function Home() {
       try {
         setIsTrendingLoading(true);
         const data = await storyNarrationApi.getTrending();
-        setTrendingTopics(data.slice(0, 2)); // Only take first 2 items for the grid
+        setTrendingTopics(data.slice(0, 10)); // Only take first 4 items for the grid
       } catch (err) {
         console.error("Error fetching trending topics:", err);
         // Silently fail - don't show error to user for trending topics
@@ -208,7 +208,7 @@ export default function Home() {
               </h3>
               {isTrendingLoading ? (
                 <div className="grid grid-cols-2 gap-4">
-                  {[1, 2].map((i) => (
+                  {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="flex flex-col gap-3">
                       <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm bg-white/60 dark:bg-slate-800/60 animate-pulse">
                         <div className="absolute bottom-3 left-3 right-3">
